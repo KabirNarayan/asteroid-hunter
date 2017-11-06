@@ -1,3 +1,4 @@
+package asteroidHunter;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -58,15 +59,18 @@ if (this.onScreen == true){
 
 			//collision detection for asteroid and ship
 			if (otherRect.intersects(shipBounds)) {
-				asteroid.translate(50, 50);
-				AsteroidGameBoard.ship
-						.setXCenter(AsteroidGameBoard.frameWidth / 2);
-				AsteroidGameBoard.ship
-						.setYCenter(AsteroidGameBoard.frameHeight / 2);
-				AsteroidGameBoard.ship.setXVelocity(2);
-				AsteroidGameBoard.ship.setYVelocity(0);
-				AsteroidGameBoard.ship.setRotationAngle(0);
-				AsteroidGameBoard.playSound("./src/explode.wav");
+				int randomXInitialPos = 0;
+				int randomYInitialPos = 0;
+				for (int i = 0; i < 10; i++) {
+					randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameWidth - 50)) + 21;
+					randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameHeight - 40)) + 16;
+				}
+
+				asteroid.xpoints = Asteroid.getInitialXPosition(randomXInitialPos);
+
+				asteroid.ypoints = Asteroid.getInitialYPosition(randomYInitialPos);
+
+				AsteroidGameBoard.playSound("./sounds/explode.wav");
 				AsteroidGameBoard.ship.takeLife();
 
 			}

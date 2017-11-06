@@ -1,3 +1,4 @@
+package asteroidHunter;
 import java.awt.*;
 
 @SuppressWarnings("serial")
@@ -5,10 +6,10 @@ public class SpaceShip extends Polygon {
 
 	// Determines the speed the ship moves
 	private double xVelocity = 2, yVelocity = 0;
-	public final static double MAX_VELOCITY = 3.955;
+	public final static double MAX_VELOCITY = 4;
 
 	// Total lives of the ship
-	private int lives;
+	private int lives = 5;
 
 	// Get the board width and height
 	int gBWidth = AsteroidGameBoard.frameWidth;
@@ -34,10 +35,9 @@ public class SpaceShip extends Polygon {
 	private double rotationAngle = 0, movingAngle = 0;
 
 	// Creates a new space ship with specified amount of lives
-	public SpaceShip(int lives) {
+	public SpaceShip() {
 		// Creates a Polygon by calling the super class Polygon
 		super(polyXArray, polyYArray, 5);
-		this.lives = lives;
 	}
 
 	// Gets & sets the values ship's lives

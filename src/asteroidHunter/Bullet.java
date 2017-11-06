@@ -1,3 +1,4 @@
+package asteroidHunter;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 
