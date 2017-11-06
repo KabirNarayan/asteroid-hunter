@@ -22,18 +22,19 @@ public class InitialScreen extends JFrame {
 	JDialog instructionDialog;
 	private String informationString;
 	
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-new InitialScreen();
+		new InitialScreen();
 	}
 
 	public InitialScreen() {
-try {
-	background = ImageIO.read(new File("./images/menu.jpg"));
-} catch (IOException e1) {
-	// TODO Auto-generated catch block
-	e1.printStackTrace();
-}
+		try {
+			background = ImageIO.read(new File("./images/menu.jpg"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		setSize(315, 428);
 		setResizable(false);
 		setLocation(300, 100);
@@ -43,59 +44,59 @@ try {
 		exitGameButton = new JButton("Exit game");
 		startGameButton.setBounds(95, 150, 125, 30);
 		startGameButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-			
-				new AsteroidGameBoard();
+String name = JOptionPane.showInputDialog(InitialScreen.this, "Please enter your name", "Enter player name", JOptionPane.QUESTION_MESSAGE);
+				
+				new AsteroidGameBoard(name);
 			}
 		});
-		
-		informationString = "GAME CONTROLS:\nw  -  move forward\ns  -  move backward\nd  -  rotate ship clockwise\na  -  rotate ship counter-clockwise\nENTER  -  shoot a bullet\n\nINSTRUCTION:\nTry to destroy every asteroid!\nPress ENTER to shoot an asteroid and \ntry not to hit any of them. You can only \nhit an asteroid 5 times in your road to\nwin, so be careful!\n\nAsteroid Hunter® by Michal Skrzypek\nmskrzypek97@gmail.com";
+
+		informationString = "GAME CONTROLS:\nw  -  move forward\ns  -  move backward\nd  -  rotate ship clockwise\na  -  rotate ship counter-clockwise\nENTER  -  shoot a bullet\n\nINSTRUCTION:\nTry to destroy every asteroid!\nPress ENTER to shoot an asteroid and \ntry not to hit any of them. \nCollect green power-ups to\nfreeze asteroids for 5 seconds!You can only \nhit an asteroid 5 times in your road to\nwin, so be careful!\n\nAsteroid Hunter® by Michal Skrzypek\nmskrzypek97@gmail.com";
 		instructionButton = new JButton("Instruction");
 		instructionButton.setBounds(95, 210, 125, 30);
 		instructionButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				JOptionPane.showMessageDialog(InitialScreen.this,new String(informationString), "Information", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(InitialScreen.this, new String(
+						informationString), "Information",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		
+
 		this.add(instructionButton);
-		
+
 		exitGameButton.setBounds(95, 270, 125, 30);
 		exitGameButton.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				System.exit(0);
 			}
 		});
-		
+
 		this.add(startGameButton);
 		this.add(exitGameButton);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
 	}
-	
-	
-	
-	class Background extends JComponent{
-		
-		public Background(){
+
+	class Background extends JComponent {
+
+		public Background() {
 			setVisible(true);
 			setSize(315, 435);
 		}
-		
-		public void paintComponent(Graphics g){
-			g.drawImage(background,  0, 0, 315, 428, null);
+
+		public void paintComponent(Graphics g) {
+			g.drawImage(background, 0, 0, 315, 428, null);
 		}
-		
+
 	}
-	
 
 }

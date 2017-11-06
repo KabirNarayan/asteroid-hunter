@@ -43,6 +43,22 @@ public static int howMany = 0;
 		return this.onScreen;
 	}
 	
+	public void setXVelovity(double xVel){
+		this.xVelocity = xVel;
+	}
+	
+	public void setYVelovity(double yVel){
+		this.yVelocity = yVel;
+	}
+	
+	public double getXVelocity(){
+		return this.xVelocity;
+	}
+	
+	public double getYVelocity(){
+		return this.yVelocity;
+	}
+	
 	public void move() {
 if (this.onScreen == true){
 		Rectangle rectToCheck = this.getBounds();

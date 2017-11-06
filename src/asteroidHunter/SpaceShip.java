@@ -52,6 +52,10 @@ public class SpaceShip extends Polygon {
 	public void takeLife() {
 		this.lives--;
 	}
+	
+	public void gainLife() {
+		this.lives++;
+	}
 
 	//Get & Set x and y coordinates for center of the ship
 	public double getXCenter() {
