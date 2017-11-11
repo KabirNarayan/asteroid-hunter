@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Asteroid extends Polygon {
 
-	
+	private static int speed;
 	private boolean onScreen;
 	private static int[] polygonXCoordinates = { -20, -10, -1, 0, 10, 8, 20, 4, -2,
 			-10, -20 };
@@ -25,8 +25,8 @@ public static int howMany = 0;
 			int numberOfCorners) {
 		super(polygonXCoordinates, polygonYCoordinates, numberOfCorners);
 
-		this.xVelocity = (Math.random() * 3) + 1;
-		this.yVelocity = (Math.random() * 3) + 1;
+		this.xVelocity = (Math.random() * speed) + 1;
+		this.yVelocity = (Math.random() * speed) + 1;
 		onScreen = true;
 	}
 
@@ -191,6 +191,14 @@ if (this.onScreen == true){
 			tempYPosition[i] += randomInitialYPosition;
 		}
 		return tempYPosition;
+	}
+
+	public static int getSpeed() {
+		return speed;
+	}
+
+	public static void setSpeed(int theSpeed) {
+		speed = theSpeed;
 	}
 
 }

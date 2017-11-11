@@ -5,7 +5,7 @@ import java.awt.*;
 public class SpaceShip extends Polygon {
 
 	// Determines the speed the ship moves
-	private double xVelocity = 2, yVelocity = 0;
+	private double xVelocity = 0, yVelocity = 0;
 	public final static double MAX_VELOCITY = 4;
 
 	// Total lives of the ship
@@ -48,6 +48,7 @@ public class SpaceShip extends Polygon {
 	public void setLives(int lives) {
 		this.lives = lives;
 	}
+	
 	//Once the ship hit an asteroid it loses one life
 	public void takeLife() {
 		this.lives--;

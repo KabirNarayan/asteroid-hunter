@@ -73,9 +73,10 @@ public class AsteroidGameBoard extends JFrame {
 	public static int pausedTimes = 0;
 	public static int aLeft = 10;
 	public static boolean slowTime = false;
-	public float timePassed = 0;
+	public static float timePassed = 0;
 	public String timePassedString;
 	private String playerName;
+	public static Planet thePlanet = null;
 
 	public AsteroidGameBoard(String playerName) {
 		this.playerName = playerName;
@@ -108,8 +109,7 @@ public class AsteroidGameBoard extends JFrame {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					System.out.println("Fire in the hole!");
 					if (currentBullets < maxBullets) {
-						bulletList.add(new Bullet(ship.getShipNoseX(), ship
-								.getShipNoseY(), ship.getRotationAngle()));
+						bulletList.add(new Bullet(ship.getShipNoseX(), ship.getShipNoseY(), ship.getRotationAngle()));
 						currentBullets++;
 						playSound("./sounds/laser.aiff");
 
@@ -123,9 +123,11 @@ public class AsteroidGameBoard extends JFrame {
 						pausedTimes--;
 					}
 
+				} else if (e.getKeyChar() == 'w' || e.getKeyChar() == 'a' || e.getKeyChar() == 's'
+						|| e.getKeyChar() == 'd') {
+					getKeyChar = e.getKeyChar();
+					keyHeld = true;
 				}
-				getKeyChar = e.getKeyChar();
-				keyHeld = true;
 			}
 		});
 
@@ -138,7 +140,7 @@ public class AsteroidGameBoard extends JFrame {
 			public void run() {
 				// TODO Auto-generated method stub
 				comp.repaint();
-				timePassed +=15;
+				timePassed += 15;
 			}
 		}, 0L, 15L, TimeUnit.MILLISECONDS);
 
@@ -170,8 +172,7 @@ public class AsteroidGameBoard extends JFrame {
 	public static void playSound(String soundPath) {
 		try {
 			Clip clip = AudioSystem.getClip();
-			AudioInputStream inputStream = AudioSystem
-					.getAudioInputStream(new File(soundPath));
+			AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(soundPath));
 			clip.open(inputStream);
 			clip.loop(0);
 			clip.start();
@@ -204,8 +205,8 @@ public class AsteroidGameBoard extends JFrame {
 
 	public static void playAgain() {
 		asteroids.clear();
+		timePassed = 0;
 		generateAsteroids();
-
 		ship.setXVelocity(2);
 		ship.setYVelocity(0);
 		ship.setXCenter(frameWidth / 2);
@@ -220,7 +221,18 @@ public class AsteroidGameBoard extends JFrame {
 
 	public static void generateAsteroids() {
 
-		for (int i = 0; i < 10; i++) {
+		int numb = 10;
+		if (InitialScreen.getLevel().equals("Easy")) {
+			numb = 8;
+			Asteroid.setSpeed(2);
+		} else if (InitialScreen.getLevel().equals("Medium")) {
+			numb = 10;
+			Asteroid.setSpeed(3);
+		} else if (InitialScreen.getLevel().equals("Hard")) {
+			numb = 12;
+			Asteroid.setSpeed(4);
+		}
+		for (int i = 0; i < numb; i++) {
 			int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
 			int randomYInitialPos = (int) (Math.random() * (frameHeight - 40)) + 16;
 
@@ -230,8 +242,7 @@ public class AsteroidGameBoard extends JFrame {
 				randomYInitialPos = (int) (Math.random() * (frameHeight - 40)) + 16;
 			}
 
-			Asteroid theasteroid = new Asteroid(
-					Asteroid.getInitialXPosition(randomXInitialPos),
+			Asteroid theasteroid = new Asteroid(Asteroid.getInitialXPosition(randomXInitialPos),
 					Asteroid.getInitialYPosition(randomYInitialPos), 11);
 
 			asteroids.add(theasteroid);
@@ -255,8 +266,7 @@ public class AsteroidGameBoard extends JFrame {
 					randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
 				}
 
-				SlowTimer st = new SlowTimer(SlowTimer
-						.getInitialXPosition(randomXInitialPos),
+				SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos),
 						SlowTimer.polygonYCoordinates, 5);
 
 				slowTimers.add(st);
@@ -265,12 +275,51 @@ public class AsteroidGameBoard extends JFrame {
 
 	}
 
+	public static void gravityForce(double angleDegrees) {
+		ship.setMovingAngle(angleDegrees);
+		if (angleDegrees <= 180) {
+			if (angleDegrees <= 90) {
+				if (ship.getXVelocity() >= (-1) * ship.MAX_VELOCITY
+						&& ship.getYVelocity() >= (-1) * ship.MAX_VELOCITY) {
+					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
+
+					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				}
+			} else {
+				if (ship.getXVelocity() <= ship.MAX_VELOCITY && ship.getYVelocity() >= (-1) * ship.MAX_VELOCITY) {
+					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
+
+					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				}
+			}
+		} else {
+			if (angleDegrees <= 270) {
+				if (ship.getXVelocity() <= ship.MAX_VELOCITY && ship.getYVelocity() <= ship.MAX_VELOCITY) {
+					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
+					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				}
+			} else {
+				if (ship.getXVelocity() >= (-1) * ship.MAX_VELOCITY && ship.getYVelocity() <= ship.MAX_VELOCITY) {
+					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
+					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				}
+			}
+		}
+
+		if (thePlanet.contains(ship.getBounds2D())) {
+			ship.setXVelocity(0);
+			ship.setYVelocity(0);
+		}
+	}
+
 	class ComponentCreator extends JComponent {
 
 		JLabel gameOverLabel = new JLabel("GAME OVER");
 
 		public ComponentCreator() {
+
 			ship = new SpaceShip();
+			thePlanet = new Planet("Earth", 50, Color.BLUE, 1);
 			generateAsteroids();
 			generateSlowTimers();
 
@@ -282,8 +331,7 @@ public class AsteroidGameBoard extends JFrame {
 			// g2.setPaint(Color.BLACK);
 			// g2.fill(new Rectangle(0, 0, frameWidth, frameHeight));
 			g2.drawImage(spaceImage, 0, 0, frameWidth, frameHeight, this);
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			// Informing player about remaining lives
 			g2.setPaint(Color.GRAY);
@@ -291,8 +339,7 @@ public class AsteroidGameBoard extends JFrame {
 			g2.setPaint(Color.RED);
 			g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
 			g2.drawString("HP", frameWidth - 200, 37);
-			Rectangle lifeRect = new Rectangle(frameWidth - 171, 21,
-					30 * ship.getLives(), 20);
+			Rectangle lifeRect = new Rectangle(frameWidth - 171, 21, 30 * ship.getLives(), 20);
 			g2.draw(lifeRect);
 			g2.fill(lifeRect);
 
@@ -302,8 +349,24 @@ public class AsteroidGameBoard extends JFrame {
 			// checking if a game is paused
 			if (!paused) {
 
-				if (!gameOver && ship.getLives() > 0
-						&& ifAnyAsteroidsLeft(asteroids)) {
+				if (!gameOver && ship.getLives() > 0 && ifAnyAsteroidsLeft(asteroids)) {
+
+					double angleRadians = Math.atan2(
+							AsteroidGameBoard.ship.getYCenter() - AsteroidGameBoard.thePlanet.getyCenter(),
+							AsteroidGameBoard.ship.getXCenter() - AsteroidGameBoard.thePlanet.getxCenter());
+					double angleDegrees = Math.toDegrees(angleRadians);
+					if (angleDegrees < 0) {
+						angleDegrees = angleDegrees + 360;
+					}
+
+					g2.setPaint(thePlanet.getPlanetColor());
+					g2.draw(thePlanet);
+					g2.fill(thePlanet);
+					g2.setPaint(Color.RED);
+					int stringWidth = g2.getFontMetrics().stringWidth(thePlanet.getPlanetName());
+					g2.drawString(thePlanet.getPlanetName(), (int) thePlanet.getxCenter() - stringWidth / 2,
+							(int) thePlanet.getyCenter());
+
 					aLeft = 0;
 					for (Asteroid asteroid : asteroids) {
 						if (asteroid.getOnScreen()) {
@@ -327,63 +390,48 @@ public class AsteroidGameBoard extends JFrame {
 						}
 					}
 					g2.setPaint(Color.GRAY);
-					timePassedString = String.format("%.2fs", timePassed/1000);
-					g2.drawString(timePassedString, frameWidth-100, frameHeight-30);
+					timePassedString = String.format("%.2fs", timePassed / 1000);
+					g2.drawString(timePassedString, frameWidth - 100, frameHeight - 30);
 
-					if (AsteroidGameBoard.keyHeld == true
-							&& AsteroidGameBoard.getKeyChar == 'd') {
+					if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'd') {
 						ship.increaseRotationAngle();
-					} else if (AsteroidGameBoard.keyHeld == true
-							&& AsteroidGameBoard.getKeyChar == 'a') {
+						gravityForce(angleDegrees);
+					} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'a') {
 						ship.decreaseRotationAngle();
-					} else if (AsteroidGameBoard.keyHeld == true
-							&& AsteroidGameBoard.getKeyChar == 'w') {
+						gravityForce(angleDegrees);
+					} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'w') {
 						ship.setMovingAngle(ship.getRotationAngle());
-						if (((ship.getRotationAngle() < 90 || ship
-								.getRotationAngle() > 270) && ship
-								.getXVelocity() <= SpaceShip.MAX_VELOCITY)
-								|| ((ship.getRotationAngle() >= 90 && ship
-										.getRotationAngle() <= 270) && ship
-										.getXVelocity() >= (-1)
-										* SpaceShip.MAX_VELOCITY)) {
-							ship.increaseXVelocity(ship.shipXMoveAngle(ship
-									.getMovingAngle()) * 0.1);
+						if (((ship.getRotationAngle() < 90 || ship.getRotationAngle() > 270)
+								&& ship.getXVelocity() <= SpaceShip.MAX_VELOCITY)
+								|| ((ship.getRotationAngle() >= 90 && ship.getRotationAngle() <= 270)
+										&& ship.getXVelocity() >= (-1) * SpaceShip.MAX_VELOCITY)) {
+							ship.increaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
 
 						}
 
-						if (((ship.getRotationAngle() >= 0 && ship
-								.getRotationAngle() <= 180) && ship
-								.getYVelocity() <= SpaceShip.MAX_VELOCITY)
-								|| ((ship.getRotationAngle() > 180 && ship
-										.getRotationAngle() <= 359) && ship
-										.getYVelocity() >= (-1)
-										* SpaceShip.MAX_VELOCITY)) {
-							ship.increaseYVelocity(ship.shipYMoveAngle(ship
-									.getMovingAngle()) * 0.1);
+						if (((ship.getRotationAngle() >= 0 && ship.getRotationAngle() <= 180)
+								&& ship.getYVelocity() <= SpaceShip.MAX_VELOCITY)
+								|| ((ship.getRotationAngle() > 180 && ship.getRotationAngle() <= 359)
+										&& ship.getYVelocity() >= (-1) * SpaceShip.MAX_VELOCITY)) {
+							ship.increaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
 						}
-					} else if (AsteroidGameBoard.keyHeld == true
-							&& AsteroidGameBoard.getKeyChar == 's') {
+					} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 's') {
 						ship.setMovingAngle(ship.getRotationAngle());
-						if (((ship.getRotationAngle() < 90 || ship
-								.getRotationAngle() > 270) && ship
-								.getXVelocity() > (-1) * SpaceShip.MAX_VELOCITY)
-								|| ((ship.getRotationAngle() >= 90 && ship
-										.getRotationAngle() <= 270) && ship
-										.getXVelocity() <= SpaceShip.MAX_VELOCITY)) {
-							ship.decreaseXVelocity(ship.shipXMoveAngle(ship
-									.getMovingAngle()) * 0.1);
+						if (((ship.getRotationAngle() < 90 || ship.getRotationAngle() > 270)
+								&& ship.getXVelocity() > (-1) * SpaceShip.MAX_VELOCITY)
+								|| ((ship.getRotationAngle() >= 90 && ship.getRotationAngle() <= 270)
+										&& ship.getXVelocity() <= SpaceShip.MAX_VELOCITY)) {
+							ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
 						}
-						if (((ship.getRotationAngle() >= 0 && ship
-								.getRotationAngle() <= 180) && ship
-								.getYVelocity() > (-1) * SpaceShip.MAX_VELOCITY)
-								|| ((ship.getRotationAngle() > 180 && ship
-										.getRotationAngle() <= 359) && ship
-										.getYVelocity() <= SpaceShip.MAX_VELOCITY)) {
-							ship.decreaseYVelocity(ship.shipYMoveAngle(ship
-									.getMovingAngle()) * 0.1);
+						if (((ship.getRotationAngle() >= 0 && ship.getRotationAngle() <= 180)
+								&& ship.getYVelocity() > (-1) * SpaceShip.MAX_VELOCITY)
+								|| ((ship.getRotationAngle() > 180 && ship.getRotationAngle() <= 359)
+										&& ship.getYVelocity() <= SpaceShip.MAX_VELOCITY)) {
+							ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
 						}
+					} else {
+						gravityForce(angleDegrees);
 					}
-
 					ship.move();
 
 					g2.setPaint(Color.GRAY);
@@ -392,8 +440,8 @@ public class AsteroidGameBoard extends JFrame {
 					g2.drawRect(95, frameHeight - 37, 162, 22);
 					g2.setPaint(Color.CYAN);
 					Rectangle speedRect = new Rectangle(96, frameHeight - 36,
-							(int) Math.max(Math.abs((int) ship.getXVelocity()),
-									Math.abs((int) ship.getYVelocity())) * 40,
+							(int) Math.max(Math.abs((int) ship.getXVelocity()), Math.abs((int) ship.getYVelocity()))
+									* 40,
 							20);
 					g2.draw(speedRect);
 					g2.fill(speedRect);
@@ -414,17 +462,14 @@ public class AsteroidGameBoard extends JFrame {
 						if (bullet.onScreen) {
 							bullet.move();
 							g2.setTransform(identity);
-							g2.translate(bullet.getXCenter(),
-									bullet.getYCenter());
+							g2.translate(bullet.getXCenter(), bullet.getYCenter());
 							g2.draw(bullet);
 							g2.setPaint(new Color(255, 252, 0));
 							g2.fill(bullet);
 
 							for (Asteroid asteroid : asteroids) {
 
-								if (asteroid.getBounds().contains(
-										bullet.getBounds())
-										&& asteroid.getOnScreen()) {
+								if (asteroid.getBounds().contains(bullet.getBounds()) && asteroid.getOnScreen()) {
 									asteroid.setOnScreen(false);
 									bullet.onScreen = false;
 									aLeft--;
@@ -438,10 +483,8 @@ public class AsteroidGameBoard extends JFrame {
 					gameOverLabel.setText("Game over!");
 					g2.setColor(Color.RED);
 					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 46));
-					int stringWidth = g2.getFontMetrics().stringWidth(
-							gameOverLabel.getText());
-					g2.drawString(gameOverLabel.getText(),
-							(int) ((frameWidth / 2) - (stringWidth / 2)),
+					int stringWidth = g2.getFontMetrics().stringWidth(gameOverLabel.getText());
+					g2.drawString(gameOverLabel.getText(), (int) ((frameWidth / 2) - (stringWidth / 2)),
 							(int) (frameHeight / 2));
 					gameOver = true;
 					// playAgainButton.setVisible(true);
@@ -450,11 +493,9 @@ public class AsteroidGameBoard extends JFrame {
 
 					g2.setColor(Color.GREEN);
 					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 46));
-					gameOverLabel.setText("You won!\n "+playerName+" in "+timePassedString);
-					int stringWidth = g2.getFontMetrics().stringWidth(
-							gameOverLabel.getText());
-					g2.drawString(gameOverLabel.getText(),
-							(int) ((frameWidth / 2) - (stringWidth / 2)),
+					gameOverLabel.setText("You won!\n " + playerName + " in " + timePassedString);
+					int stringWidth = g2.getFontMetrics().stringWidth(gameOverLabel.getText());
+					g2.drawString(gameOverLabel.getText(), (int) ((frameWidth / 2) - (stringWidth / 2)),
 							(int) (frameHeight / 2));
 					gameOver = true;
 				}
@@ -464,9 +505,7 @@ public class AsteroidGameBoard extends JFrame {
 				g2.setPaint(Color.YELLOW);
 				g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 46));
 				int stringWidth = g2.getFontMetrics().stringWidth("Paused");
-				g2.drawString("Paused",
-						(int) ((frameWidth / 2) - (stringWidth / 2)),
-						(int) (frameHeight / 2));
+				g2.drawString("Paused", (int) ((frameWidth / 2) - (stringWidth / 2)), (int) (frameHeight / 2));
 			}
 		}
 	}
