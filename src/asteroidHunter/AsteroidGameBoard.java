@@ -56,6 +56,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import com.sun.javafx.scene.traversal.TopMostTraversalEngine;
+
 import powerUps.SlowTimer;
 
 public class AsteroidGameBoard extends JFrame {
@@ -84,18 +86,18 @@ public class AsteroidGameBoard extends JFrame {
 	public static int aLeft = 10;
 	public static boolean slowTime = false;
 	public static float timePassed = 0;
-	public String timePassedString;
-	private String playerName;
+	public static String timePassedString;
+	private static String playerName;
 	public static Planet thePlanet = null;
 	private File highScores;
 	private FileWriter fw;
 	private BufferedWriter bw;
 	private FileReader fr;
 	private BufferedReader br;
-	private ArrayList<String> scoreNames;
-	private ArrayList<Double> scoreTimes;
-	private ArrayList<String> scoresTotal;
-	static boolean closed;
+	private static ArrayList<String> scoreNames;
+	private static ArrayList<Double> scoreTimes;
+	private static ArrayList<String> scoresTotal;
+	private static boolean closed;
 
 	public AsteroidGameBoard(String playerName) {
 		closed = false;
@@ -109,8 +111,8 @@ public class AsteroidGameBoard extends JFrame {
 		this.setSize(frameWidth + 15, frameHeight + 60);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("Asteroid Hunter");
+		highScores = new File("./src/high_scores.txt");
 		try {
-			highScores = new File("./src/high_scores.txt");
 			fr = new FileReader(highScores);
 			br = new BufferedReader(fr);
 			fw = new FileWriter(highScores, true);
@@ -119,10 +121,7 @@ public class AsteroidGameBoard extends JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-		scoreNames = new ArrayList<String>();
-		scoreTimes = new ArrayList<Double>();
-		scoresTotal = new ArrayList<String>();
+		
 		gameOver = false;
 		comp = new ComponentCreator();
 		this.addKeyListener(new KeyListener() {
@@ -141,7 +140,6 @@ public class AsteroidGameBoard extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					System.out.println("Fire in the hole!");
 					if (currentBullets < maxBullets) {
 						bulletList.add(new Bullet(ship.getShipNoseX(), ship.getShipNoseY(), ship.getRotationAngle()));
 						currentBullets++;
@@ -245,9 +243,10 @@ public class AsteroidGameBoard extends JFrame {
 
 	public static void playAgain() {
 		asteroids.clear();
+		/*scoresTotal.clear();
+		scoreNames.clear();
+		scoreTimes.clear();*/
 		timePassed = 0;
-		generateAsteroids();
-		generateSlowTimers();
 		ship.setXVelocity(2);
 		ship.setYVelocity(0);
 		ship.setXCenter(frameWidth / 2);
@@ -257,6 +256,8 @@ public class AsteroidGameBoard extends JFrame {
 		ship.setLives(5);
 		gameOver = false;
 		closed = false;
+		generateAsteroids();
+		
 		// playAgainButton.setVisible(false);
 
 	}
@@ -274,7 +275,7 @@ public class AsteroidGameBoard extends JFrame {
 			numb = 12;
 			Asteroid.setSpeed(4);
 		}
-		for (int i = 0; i < 0; i++) {
+		for (int i = 0; i < 1; i++) {
 			int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
 			int randomYInitialPos = (int) (Math.random() * (frameHeight - 40)) + 16;
 
@@ -362,6 +363,19 @@ public class AsteroidGameBoard extends JFrame {
 	}
 
 	public void getHighScores(BufferedReader bReader) {
+		try {
+			
+			fr = new FileReader(highScores);
+			br = new BufferedReader(fr);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		scoreNames = new ArrayList<String>();
+		scoreTimes = new ArrayList<Double>();
+		scoresTotal = new ArrayList<String>();
+		
 		String line = null;
 		String[] playerScore = new String[2];
 		HashMap<Double, String> map = new HashMap<Double, String>();
@@ -383,9 +397,6 @@ public class AsteroidGameBoard extends JFrame {
 				e.printStackTrace();
 			}
 		}
-		StringBuffer sb = new StringBuffer("");
-		String lol = "";
-
 		Collections.sort(scoreTimes);
 		int i = 1;
 		for (Double score : scoreTimes) {
@@ -589,14 +600,16 @@ public class AsteroidGameBoard extends JFrame {
 							e.printStackTrace();
 						}
 					}
-					
-					g2.setColor(Color.GREEN);
+					g2.setColor(new Color(103,255,103));
+					g2.setFont(new Font("Baskerville Old Face", Font.BOLD, 30));
+					g2.drawString("HIGH SCORES", frameWidth/2 - 80, frameHeight/4);
+					g2.setColor(new Color(155, 255, 155));
 					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
 					// gameOverLabel.setText("You won!\n " + playerName + " in " +
 					// timePassedString);
 					for (int i = 0; i < scoresTotal.size(); i++) {
-						g2.drawString(scoresTotal.get(i), (int) (frameWidth / 2 - 80),
-								(int) (frameHeight / 4 + i * 30));
+						g2.drawString(scoresTotal.get(i), (int) (frameWidth / 2 - 75),
+								(int) (frameHeight / 3 + i * 30));
 					}
 					gameOver = true;
 				}
