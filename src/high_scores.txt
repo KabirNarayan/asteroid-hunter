@@ -1,0 +1,12 @@
+TomekTime:10230.0
+KasiaTime:7155.0
+HubertTime:10755.0
+DawidTime:3285.0
+FilipTime:2460.0
+KubaTime:1275.0
+KozakTime:2145.0
+JaszczombTime:4110.0
+GizolTime:1230.0
+GielTime:4665.0
+KarolinaTime:1350.0
+BabelTime:3495.0

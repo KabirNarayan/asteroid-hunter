@@ -20,11 +20,20 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +54,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import powerUps.SlowTimer;
 
@@ -77,8 +87,18 @@ public class AsteroidGameBoard extends JFrame {
 	public String timePassedString;
 	private String playerName;
 	public static Planet thePlanet = null;
+	private File highScores;
+	private FileWriter fw;
+	private BufferedWriter bw;
+	private FileReader fr;
+	private BufferedReader br;
+	private ArrayList<String> scoreNames;
+	private ArrayList<Double> scoreTimes;
+	private ArrayList<String> scoresTotal;
+	static boolean closed;
 
 	public AsteroidGameBoard(String playerName) {
+		closed = false;
 		this.playerName = playerName;
 		try {
 			spaceImage = ImageIO.read(new File("./images/space.jpeg"));
@@ -88,7 +108,21 @@ public class AsteroidGameBoard extends JFrame {
 		}
 		this.setSize(frameWidth + 15, frameHeight + 60);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setTitle("Asteroids");
+		this.setTitle("Asteroid Hunter");
+		try {
+			highScores = new File("./src/high_scores.txt");
+			fr = new FileReader(highScores);
+			br = new BufferedReader(fr);
+			fw = new FileWriter(highScores, true);
+			bw = new BufferedWriter(fw);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		scoreNames = new ArrayList<String>();
+		scoreTimes = new ArrayList<Double>();
+		scoresTotal = new ArrayList<String>();
 		gameOver = false;
 		comp = new ComponentCreator();
 		this.addKeyListener(new KeyListener() {
@@ -151,7 +185,13 @@ public class AsteroidGameBoard extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				playAgain();
+				String name = JOptionPane.showInputDialog(AsteroidGameBoard.this, "Please enter your name",
+						"Enter player name", JOptionPane.QUESTION_MESSAGE);
+				if (name != null) {
+					setPlayerName(name);
+					playAgain();
+				}
+
 			}
 		});
 		fileMenu.add(playAgainItem);
@@ -207,14 +247,16 @@ public class AsteroidGameBoard extends JFrame {
 		asteroids.clear();
 		timePassed = 0;
 		generateAsteroids();
+		generateSlowTimers();
 		ship.setXVelocity(2);
 		ship.setYVelocity(0);
 		ship.setXCenter(frameWidth / 2);
-		ship.setYCenter(frameHeight / 2);
+		ship.setYCenter(frameHeight / 2 - 70);
 		ship.setMovingAngle(0);
 		ship.setRotationAngle(0);
 		ship.setLives(5);
 		gameOver = false;
+		closed = false;
 		// playAgainButton.setVisible(false);
 
 	}
@@ -232,7 +274,7 @@ public class AsteroidGameBoard extends JFrame {
 			numb = 12;
 			Asteroid.setSpeed(4);
 		}
-		for (int i = 0; i < numb; i++) {
+		for (int i = 0; i < 0; i++) {
 			int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
 			int randomYInitialPos = (int) (Math.random() * (frameHeight - 40)) + 16;
 
@@ -272,45 +314,87 @@ public class AsteroidGameBoard extends JFrame {
 				slowTimers.add(st);
 			}
 		}, 0, 5, TimeUnit.SECONDS);
-
 	}
 
-	public static void gravityForce(double angleDegrees) {
-		ship.setMovingAngle(angleDegrees);
+	public static void gravityForce(SpaceShip theShip, Planet thePlanet) {
+
+		double angleRadians = Math.atan2(theShip.getYCenter() - thePlanet.getyCenter(),
+				theShip.getXCenter() - thePlanet.getxCenter());
+		double angleDegrees = Math.toDegrees(angleRadians);
+		if (angleDegrees < 0) {
+			angleDegrees = angleDegrees + 360;
+		}
+
+		theShip.setMovingAngle(angleDegrees);
 		if (angleDegrees <= 180) {
 			if (angleDegrees <= 90) {
-				if (ship.getXVelocity() >= (-1) * ship.MAX_VELOCITY
-						&& ship.getYVelocity() >= (-1) * ship.MAX_VELOCITY) {
-					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
-
-					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				if (theShip.getXVelocity() >= (-1) * theShip.MAX_VELOCITY
+						&& theShip.getYVelocity() >= (-1) * theShip.MAX_VELOCITY) {
+					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
+					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * 0.1);
 				}
 			} else {
-				if (ship.getXVelocity() <= ship.MAX_VELOCITY && ship.getYVelocity() >= (-1) * ship.MAX_VELOCITY) {
-					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
-
-					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				if (theShip.getXVelocity() <= theShip.MAX_VELOCITY
+						&& theShip.getYVelocity() >= (-1) * theShip.MAX_VELOCITY) {
+					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
+					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * 0.1);
 				}
 			}
 		} else {
 			if (angleDegrees <= 270) {
-				if (ship.getXVelocity() <= ship.MAX_VELOCITY && ship.getYVelocity() <= ship.MAX_VELOCITY) {
-					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
-					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				if (theShip.getXVelocity() <= theShip.MAX_VELOCITY && theShip.getYVelocity() <= theShip.MAX_VELOCITY) {
+					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
+					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * 0.1);
 				}
 			} else {
-				if (ship.getXVelocity() >= (-1) * ship.MAX_VELOCITY && ship.getYVelocity() <= ship.MAX_VELOCITY) {
-					ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
-					ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
+				if (theShip.getXVelocity() >= (-1) * theShip.MAX_VELOCITY
+						&& theShip.getYVelocity() <= theShip.MAX_VELOCITY) {
+					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
+					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * 0.1);
 				}
 			}
 		}
 
-		if (thePlanet.contains(ship.getBounds2D())) {
-			ship.setXVelocity(0);
-			ship.setYVelocity(0);
+		if (thePlanet.contains(theShip.getBounds2D())) {
+			theShip.setXVelocity(0);
+			theShip.setYVelocity(0);
 		}
 	}
+
+	public void getHighScores(BufferedReader bReader) {
+		String line = null;
+		String[] playerScore = new String[2];
+		HashMap<Double, String> map = new HashMap<Double, String>();
+		try {
+			line = bReader.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while (line != null) {
+			playerScore = line.split("Time:");
+			scoreNames.add(playerScore[0]);
+			scoreTimes.add(Double.parseDouble(playerScore[1]));
+			map.put(Double.parseDouble(playerScore[1]), playerScore[0]);
+			try {
+				line = bReader.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		StringBuffer sb = new StringBuffer("");
+		String lol = "";
+
+		Collections.sort(scoreTimes);
+		int i = 1;
+		for (Double score : scoreTimes) {
+			if(i<=10) {
+				scoresTotal.add(i + ". " + map.get(score) + " " + String.format("%.2fs", score/1000));
+				i++;
+}}
+		}
+	
 
 	class ComponentCreator extends JComponent {
 
@@ -319,7 +403,8 @@ public class AsteroidGameBoard extends JFrame {
 		public ComponentCreator() {
 
 			ship = new SpaceShip();
-			thePlanet = new Planet("Earth", 50, Color.BLUE, 1);
+			ship.setYCenter(ship.getYCenter() - 70);
+			thePlanet = new Planet("Earth", 60, Color.BLUE, 1);
 			generateAsteroids();
 			generateSlowTimers();
 
@@ -328,8 +413,6 @@ public class AsteroidGameBoard extends JFrame {
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			AffineTransform identity = new AffineTransform();
-			// g2.setPaint(Color.BLACK);
-			// g2.fill(new Rectangle(0, 0, frameWidth, frameHeight));
 			g2.drawImage(spaceImage, 0, 0, frameWidth, frameHeight, this);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -351,14 +434,6 @@ public class AsteroidGameBoard extends JFrame {
 
 				if (!gameOver && ship.getLives() > 0 && ifAnyAsteroidsLeft(asteroids)) {
 
-					double angleRadians = Math.atan2(
-							AsteroidGameBoard.ship.getYCenter() - AsteroidGameBoard.thePlanet.getyCenter(),
-							AsteroidGameBoard.ship.getXCenter() - AsteroidGameBoard.thePlanet.getxCenter());
-					double angleDegrees = Math.toDegrees(angleRadians);
-					if (angleDegrees < 0) {
-						angleDegrees = angleDegrees + 360;
-					}
-
 					g2.setPaint(thePlanet.getPlanetColor());
 					g2.draw(thePlanet);
 					g2.fill(thePlanet);
@@ -366,6 +441,13 @@ public class AsteroidGameBoard extends JFrame {
 					int stringWidth = g2.getFontMetrics().stringWidth(thePlanet.getPlanetName());
 					g2.drawString(thePlanet.getPlanetName(), (int) thePlanet.getxCenter() - stringWidth / 2,
 							(int) thePlanet.getyCenter());
+					/*
+					 * Image earth=null; try { earth = ImageIO.read(new File("./images/earth.png"));
+					 * } catch (IOException e) { // TODO Auto-generated catch block
+					 * e.printStackTrace(); } g2.drawImage(earth, (int)thePlanet.getX(),
+					 * (int)thePlanet.getY(), (int)thePlanet.getWidth(),
+					 * (int)thePlanet.getHeight(),null);
+					 */
 
 					aLeft = 0;
 					for (Asteroid asteroid : asteroids) {
@@ -395,10 +477,10 @@ public class AsteroidGameBoard extends JFrame {
 
 					if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'd') {
 						ship.increaseRotationAngle();
-						gravityForce(angleDegrees);
+						gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
 					} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'a') {
 						ship.decreaseRotationAngle();
-						gravityForce(angleDegrees);
+						gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
 					} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'w') {
 						ship.setMovingAngle(ship.getRotationAngle());
 						if (((ship.getRotationAngle() < 90 || ship.getRotationAngle() > 270)
@@ -430,7 +512,7 @@ public class AsteroidGameBoard extends JFrame {
 							ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
 						}
 					} else {
-						gravityForce(angleDegrees);
+						gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
 					}
 					ship.move();
 
@@ -481,6 +563,7 @@ public class AsteroidGameBoard extends JFrame {
 
 				} else if (ship.getLives() <= 0) {
 					gameOverLabel.setText("Game over!");
+					executor1.shutdown();
 					g2.setColor(Color.RED);
 					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 46));
 					int stringWidth = g2.getFontMetrics().stringWidth(gameOverLabel.getText());
@@ -490,13 +573,31 @@ public class AsteroidGameBoard extends JFrame {
 					// playAgainButton.setVisible(true);
 
 				} else if (!ifAnyAsteroidsLeft(asteroids)) {
+					if (!closed) {
+						try {
+							bw.write(playerName + "Time:" + timePassed);
+							bw.newLine();
+							bw.flush();
+							closed = true;
+							executor1.shutdown();
+							
+							getHighScores(br);
+							//stringWidth = g2.getFontMetrics().stringWidth(gameOverLabel.getText());
 
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
 					g2.setColor(Color.GREEN);
-					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 46));
-					gameOverLabel.setText("You won!\n " + playerName + " in " + timePassedString);
-					int stringWidth = g2.getFontMetrics().stringWidth(gameOverLabel.getText());
-					g2.drawString(gameOverLabel.getText(), (int) ((frameWidth / 2) - (stringWidth / 2)),
-							(int) (frameHeight / 2));
+					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
+					// gameOverLabel.setText("You won!\n " + playerName + " in " +
+					// timePassedString);
+					for (int i = 0; i < scoresTotal.size(); i++) {
+						g2.drawString(scoresTotal.get(i), (int) (frameWidth / 2 - 80),
+								(int) (frameHeight / 4 + i * 30));
+					}
 					gameOver = true;
 				}
 			}
@@ -508,5 +609,13 @@ public class AsteroidGameBoard extends JFrame {
 				g2.drawString("Paused", (int) ((frameWidth / 2) - (stringWidth / 2)), (int) (frameHeight / 2));
 			}
 		}
+	}
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
 	}
 }
