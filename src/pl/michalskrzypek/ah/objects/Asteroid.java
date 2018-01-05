@@ -9,7 +9,7 @@ import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 
 public class Asteroid extends Polygon {
 
-	private static int speed;
+	private static double speed;
 	private boolean onScreen;
 	private static int[] polygonXCoordinates = { -20, -10, -1, 0, 10, 8, 20, 4, -2,
 			-10, -20 };
@@ -224,11 +224,11 @@ if (this.onScreen == true){
 		return tempYPosition;
 	}
 
-	public static int getSpeed() {
+	public static double getSpeed() {
 		return speed;
 	}
 
-	public static void setSpeed(int theSpeed) {
+	public static void setSpeed(double theSpeed) {
 		speed = theSpeed;
 	}
 

@@ -65,6 +65,7 @@ import pl.michalskrzypek.ah.objects.Asteroid;
 import pl.michalskrzypek.ah.objects.Bullet;
 import pl.michalskrzypek.ah.objects.Planet;
 import pl.michalskrzypek.ah.objects.SpaceShip;
+import pl.michalskrzypek.ah.powerups.Freezer;
 import pl.michalskrzypek.ah.powerups.SlowTimer;
 
 /*
@@ -79,8 +80,7 @@ public class AsteroidGameBoard extends JFrame {
 	public static char getKeyChar;
 	public static final int maxBullets = 5;
 	public static int currentBullets = 0;
-	public static ScheduledThreadPoolExecutor executor;
-	public static ScheduledThreadPoolExecutor executor1;
+	public static ScheduledThreadPoolExecutor executor, executor1;
 	public static JMenuBar menuBar;
 	public static JMenu fileMenu;
 	public static JMenuItem playAgainItem, goToMenuItem, exitItem;
@@ -88,6 +88,7 @@ public class AsteroidGameBoard extends JFrame {
 	public static Image spaceImage;
 	public static ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
 	public static ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
+	public static ArrayList<Freezer> freezers = new ArrayList<Freezer>();
 	public static ArrayList<SlowTimer> slowTimers = new ArrayList<SlowTimer>();
 	public static int pausedTimes = 0;
 	public static int aLeft = 8;
@@ -103,6 +104,7 @@ public class AsteroidGameBoard extends JFrame {
 	private static BufferedReader br;
 	private static ArrayList<Double> scoreTimes;
 	private static ArrayList<String> scoresTotal;
+	public static boolean freeze = false;
 	public static boolean slowTime = false;
 	public static boolean gameOver = false;
 	public static boolean paused = false;
@@ -113,6 +115,7 @@ public class AsteroidGameBoard extends JFrame {
 		paused = false;
 		closed = false;
 		playerName = pName;
+		executor1 = new ScheduledThreadPoolExecutor(5);
 
 		this.setSize(frameWidth + 15, frameHeight + 60);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -147,7 +150,7 @@ public class AsteroidGameBoard extends JFrame {
 				paused = true;
 				String name = JOptionPane.showInputDialog(AsteroidGameBoard.this, "Please enter your name",
 						"Enter player name", JOptionPane.QUESTION_MESSAGE);
-name = name.trim();
+				name = name.trim();
 				String[] options = { "Easy", "Medium", "Hard" };
 
 				int option = JOptionPane.showOptionDialog(AsteroidGameBoard.this, new String("Select level:"), "",
@@ -284,7 +287,7 @@ name = name.trim();
 		gameOver = false;
 		closed = false;
 		generateAsteroids();
-		generateSlowTimers();
+		generateFreezers();
 	}
 
 	public static void generateAsteroids() {
@@ -303,7 +306,7 @@ name = name.trim();
 			numb = 10;
 			Asteroid.setSpeed(4);
 		}
-		for (int i = 0; i < numb; i++) {
+		for (int i = 0; i < 1; i++) {
 			int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
 			int randomYInitialPos = (int) (Math.random() * (frameHeight - 40)) + 16;
 
@@ -321,10 +324,9 @@ name = name.trim();
 		}
 	}// END of generateAsteroids method
 
-	// Generates a slow timer power up every 5 seconds
+	// Generates a freezer power up every 7 seconds
 	public static void generateSlowTimers() {
 
-		executor1 = new ScheduledThreadPoolExecutor(5);
 		executor1.scheduleAtFixedRate(new Runnable() {
 
 			@Override
@@ -344,14 +346,43 @@ name = name.trim();
 						randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
 					}
 
-					SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos),
-							SlowTimer.polygonYCoordinates, 5);
+					SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos));
 					slowTimers.add(st);
 				}
 				counter = 0;
 			}
-		}, 0, 1, TimeUnit.SECONDS);
-	}// END of generateSlowTimers method
+		}, 0, 7, TimeUnit.SECONDS);
+	}
+	
+	// Generates a freezer power up every 10 seconds
+	public static void generateFreezers() {
+
+		executor1.scheduleAtFixedRate(new Runnable() {
+
+			@Override
+			public void run() {
+
+				int counter = 0;
+				for (Freezer f : AsteroidGameBoard.freezers) {
+					if (f.getOnScreen()) {
+						counter++;
+					}
+				}
+
+				if (counter == 0 && generate) {
+					int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
+
+					while ((randomXInitialPos >= frameWidth / 2 - 50 && randomXInitialPos <= frameWidth / 2 + 50)) {
+						randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
+					}
+
+					Freezer fr = new Freezer(Freezer.getInitialXPosition(randomXInitialPos));
+					freezers.add(fr);
+				}
+				counter = 0;
+			}
+		}, 5, 10, TimeUnit.SECONDS);
+	}// END of generateFreezers method
 
 	/*
 	 * Adding gravity force to every asteroid on the board
@@ -394,6 +425,8 @@ name = name.trim();
 	 * }
 	 */
 
+	
+	
 	/*
 	 * Adds gravity force to a ship
 	 * 
@@ -573,6 +606,7 @@ name = name.trim();
 			ship.setYCenter(ship.getYCenter() - 70);
 			thePlanet = new Planet("Venus", 60, Color.BLUE, 0.1);
 			generateAsteroids();
+			generateFreezers();
 			generateSlowTimers();
 
 			// reading background image
@@ -638,7 +672,7 @@ name = name.trim();
 					aLeft = 0;
 					for (Asteroid asteroid : asteroids) {
 						if (asteroid.getOnScreen()) {
-							if (!slowTime) {
+							if (!freeze) {
 								generate = true;
 								asteroid.move();
 								// asteroidGravityForce(thePlanet);
@@ -653,10 +687,19 @@ name = name.trim();
 						}
 					}
 
+					for (Freezer fr : AsteroidGameBoard.freezers) {
+						if (fr.getOnScreen()) {
+							fr.move();
+							g2.setPaint(Color.GREEN);
+							g2.draw(fr);
+							g2.fill(fr);
+						}
+					}
+					
 					for (SlowTimer st : AsteroidGameBoard.slowTimers) {
 						if (st.getOnScreen()) {
 							st.move();
-							g2.setPaint(Color.GREEN);
+							g2.setPaint(Color.BLUE);
 							g2.draw(st);
 							g2.fill(st);
 						}
@@ -744,10 +787,16 @@ name = name.trim();
 						}
 					}
 					g2.setColor(new Color(103, 255, 103));
-					g2.setFont(new Font("Baskerville Old Face", Font.BOLD, 30));
+					g2.setFont(new Font("Aharoni", Font.BOLD, 30));
 					g2.drawString("HIGH SCORES", frameWidth / 2 - 80, frameHeight / 4);
-					g2.setColor(new Color(155, 255, 155));
-					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
+
+					// g2.setColor(new Color(170, 250, 170));
+					g2.setColor(new Color(240, 240, 240));
+					g2.setFont(new Font("Aharoni", Font.PLAIN, 20));
+					g2.drawString(InitialScreen.getLevel() + " level", frameWidth / 2 - 80, frameHeight / 4 + 20);
+
+					g2.setColor(new Color(50, 200, 50));
+					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 17));
 					for (int i = 0; i < scoresTotal.size(); i++) {
 						g2.drawString(scoresTotal.get(i), (int) (frameWidth / 2 - 75),
 								(int) (frameHeight / 3 + i * 30));
