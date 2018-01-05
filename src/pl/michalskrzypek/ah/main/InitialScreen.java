@@ -55,6 +55,9 @@ public class InitialScreen extends JFrame {
 
 				String name = JOptionPane.showInputDialog(InitialScreen.this, "Please enter your name", null,
 						JOptionPane.QUESTION_MESSAGE);
+				
+				name = name.trim();
+				
 				if (name != null && name.length()>=3){
 					InitialScreen.this.dispose();
 					new AsteroidGameBoard(name);

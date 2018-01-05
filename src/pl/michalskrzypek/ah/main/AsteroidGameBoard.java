@@ -84,18 +84,15 @@ public class AsteroidGameBoard extends JFrame {
 	public static JMenuBar menuBar;
 	public static JMenu fileMenu;
 	public static JMenuItem playAgainItem, goToMenuItem, exitItem;
-	public static boolean gameOver = false;
 	public static ComponentCreator comp;
 	public static Image spaceImage;
-	public static String livesLeft;
 	public static ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
 	public static ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 	public static ArrayList<SlowTimer> slowTimers = new ArrayList<SlowTimer>();
-	public static boolean paused = false;
 	public static int pausedTimes = 0;
 	public static int aLeft = 8;
-	public static boolean slowTime = false;
 	public static float timePassed = 0;
+	public static String livesLeft;
 	public static String timePassedString;
 	private static String playerName;
 	public static Planet thePlanet = null;
@@ -106,30 +103,22 @@ public class AsteroidGameBoard extends JFrame {
 	private static BufferedReader br;
 	private static ArrayList<Double> scoreTimes;
 	private static ArrayList<String> scoresTotal;
+	public static boolean slowTime = false;
+	public static boolean gameOver = false;
+	public static boolean paused = false;
 	private static boolean closed;
 	private static boolean generate = true;
 
-	public AsteroidGameBoard(String playerName) {
+	public AsteroidGameBoard(String pName) {
 		paused = false;
 		closed = false;
-		this.playerName = playerName;
+		playerName = pName;
 
 		this.setSize(frameWidth + 15, frameHeight + 60);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("Asteroid Hunter");
 
-		highScores = new File("./src/high_scores.txt");
-
-		// readers and writers needed to save and read the high scores
-		try {
-			fr = new FileReader(highScores);
-			br = new BufferedReader(fr);
-			fw = new FileWriter(highScores, true);
-			bw = new BufferedWriter(fw);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		initiateHighScoresFiles();
 
 		// initializing key listener
 		this.addKeyListener(new KeyManager());
@@ -158,7 +147,7 @@ public class AsteroidGameBoard extends JFrame {
 				paused = true;
 				String name = JOptionPane.showInputDialog(AsteroidGameBoard.this, "Please enter your name",
 						"Enter player name", JOptionPane.QUESTION_MESSAGE);
-
+name = name.trim();
 				String[] options = { "Easy", "Medium", "Hard" };
 
 				int option = JOptionPane.showOptionDialog(AsteroidGameBoard.this, new String("Select level:"), "",
@@ -175,15 +164,16 @@ public class AsteroidGameBoard extends JFrame {
 				}
 
 				if (name != null) {
-				
+
 				}
-				if (name != null && name.length()>=3){
-					setPlayerName(name);
+				if (name != null && name.length() >= 3) {
+					playerName = name;
 					playAgain();
 				}
-				
-				if(name!= null && name.length()<3) {
-					JOptionPane.showMessageDialog(AsteroidGameBoard.this, "Name is too short! (min 3 letters)", null, JOptionPane.ERROR_MESSAGE);
+
+				if (name != null && name.length() < 3) {
+					JOptionPane.showMessageDialog(AsteroidGameBoard.this, "Name is too short! (min 3 letters)", null,
+							JOptionPane.ERROR_MESSAGE);
 					paused = false;
 				}
 
@@ -220,6 +210,31 @@ public class AsteroidGameBoard extends JFrame {
 		this.setVisible(true);
 	}
 
+	private static void initiateHighScoresFiles() {
+		File highScoresEasy = new File("./src/high_scores_easy.txt");
+		File highScoresMedium = new File("./src/high_scores_medium.txt");
+		File highScoresHard = new File("./src/high_scores_hard.txt");
+		// readers and writers needed to save and read the high scores
+
+		if (InitialScreen.getLevel().equals("Easy")) {
+			highScores = highScoresEasy;
+		} else if (InitialScreen.getLevel().equals("Medium")) {
+			highScores = highScoresMedium;
+		} else if (InitialScreen.getLevel().equals("Hard")) {
+			highScores = highScoresHard;
+		}
+
+		try {
+			fr = new FileReader(highScores);
+			br = new BufferedReader(fr);
+			fw = new FileWriter(highScores, true);
+			bw = new BufferedWriter(fw);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
 	public static void playSound(String soundPath) {
 		try {
 			Clip clip = AudioSystem.getClip();
@@ -254,19 +269,15 @@ public class AsteroidGameBoard extends JFrame {
 		}
 	}
 
-	
-	public static void setPaused(boolean p) {
-		paused = p;
-	}
-	
 	public static void playAgain() {
+		initiateHighScoresFiles();
 		asteroids.clear();
 		paused = false;
 		timePassed = 0;
 		ship.setXVelocity(2);
 		ship.setYVelocity(0);
-		ship.setXCenter(frameWidth / 2);
-		ship.setYCenter(frameHeight / 2 - 70);
+		ship.setXCenter(frameWidth / 2 + 100);
+		ship.setYCenter(frameHeight / 2 - 100);
 		ship.setMovingAngle(0);
 		ship.setRotationAngle(0);
 		ship.setLives(5);
@@ -279,17 +290,17 @@ public class AsteroidGameBoard extends JFrame {
 	public static void generateAsteroids() {
 
 		asteroids.clear();
-		int numb = 10;
+		int numb = 6;
 
 		// setting proper asteroids number (regarding to the chosen level)
 		if (InitialScreen.getLevel().equals("Easy")) {
-			numb = 8;
+			numb = 6;
 			Asteroid.setSpeed(2);
 		} else if (InitialScreen.getLevel().equals("Medium")) {
-			numb = 10;
+			numb = 8;
 			Asteroid.setSpeed(3);
 		} else if (InitialScreen.getLevel().equals("Hard")) {
-			numb = 12;
+			numb = 10;
 			Asteroid.setSpeed(4);
 		}
 		for (int i = 0; i < numb; i++) {
@@ -313,30 +324,29 @@ public class AsteroidGameBoard extends JFrame {
 	// Generates a slow timer power up every 5 seconds
 	public static void generateSlowTimers() {
 
-		
 		executor1 = new ScheduledThreadPoolExecutor(5);
 		executor1.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			public void run() {
-			
+
 				int counter = 0;
-				for(SlowTimer s : AsteroidGameBoard.slowTimers) {
-					if(s.getOnScreen()) {
-						counter++;	
-				}
-				}
-				
-				if(counter==0 && generate) {
-				int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
-
-				while ((randomXInitialPos >= frameWidth / 2 - 50 && randomXInitialPos <= frameWidth / 2 + 50)) {
-					randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
+				for (SlowTimer s : AsteroidGameBoard.slowTimers) {
+					if (s.getOnScreen()) {
+						counter++;
+					}
 				}
 
-				SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos),
-						SlowTimer.polygonYCoordinates, 5);
-				slowTimers.add(st);
+				if (counter == 0 && generate) {
+					int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
+
+					while ((randomXInitialPos >= frameWidth / 2 - 50 && randomXInitialPos <= frameWidth / 2 + 50)) {
+						randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
+					}
+
+					SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos),
+							SlowTimer.polygonYCoordinates, 5);
+					slowTimers.add(st);
 				}
 				counter = 0;
 			}
@@ -505,8 +515,7 @@ public class AsteroidGameBoard extends JFrame {
 			}
 		}
 	}// END of getHighScores method
-	
-	
+
 	// MAIN CODE FOR MAKING A SHIP FLOAT
 	public void shipFly() {
 		if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'd') {
@@ -604,7 +613,6 @@ public class AsteroidGameBoard extends JFrame {
 			// Informing a player about asteroid left
 			g2.setPaint(Color.GRAY);
 			g2.drawString("Asteroids left: " + Integer.toString(aLeft), 30, 37);
-			
 
 			// checking if a game is paused
 			if (!paused) {
@@ -634,7 +642,7 @@ public class AsteroidGameBoard extends JFrame {
 								generate = true;
 								asteroid.move();
 								// asteroidGravityForce(thePlanet);
-							}else {
+							} else {
 								generate = false;
 							}
 							g2.setPaint(Color.LIGHT_GRAY);
@@ -659,9 +667,7 @@ public class AsteroidGameBoard extends JFrame {
 					timePassedString = String.format("%.2fs", timePassed / 1000);
 					g2.drawString(timePassedString, frameWidth - 100, frameHeight - 30);
 
-					
 					shipFly();
-					
 
 					// Informing player about the speed of a ship
 					g2.setPaint(Color.GRAY);
@@ -760,13 +766,4 @@ public class AsteroidGameBoard extends JFrame {
 		}
 	}
 
-
-
-	public String getPlayerName() {
-		return playerName;
-	}
-
-	public void setPlayerName(String playerName) {
-		this.playerName = playerName;
-	}
 }

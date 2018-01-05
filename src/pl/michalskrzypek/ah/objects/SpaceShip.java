@@ -18,7 +18,7 @@ public class SpaceShip extends Polygon {
 	int gBHeight = AsteroidGameBoard.frameHeight;
 
 	// Center of space ship
-	private double centerX = gBWidth / 2, centerY = gBHeight / 2;
+	private double centerX = gBWidth / 2 + 50, centerY = gBHeight / 2 - 50;
 
 	// Will hold the x & y coordinates for the ship
 	// Everything is based on coordinates from the center
