@@ -17,6 +17,3 @@ dTime:14250.0
 dTime:13680.0
 dTime:54075.0
 MikeTime:30255.0
-mikeTime:9165.0
-fTime:10905.0
-dTime:13650.0
