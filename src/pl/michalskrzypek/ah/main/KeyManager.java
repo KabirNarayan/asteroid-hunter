@@ -26,12 +26,13 @@ public class KeyManager implements KeyListener{
 			if (AsteroidGameBoard.currentBullets < AsteroidGameBoard.maxBullets) {
 				AsteroidGameBoard.bulletList.add(new Bullet(AsteroidGameBoard.ship.getShipNoseX(), AsteroidGameBoard.ship.getShipNoseY(), AsteroidGameBoard.ship.getRotationAngle()));
 				AsteroidGameBoard.currentBullets++;
-				AsteroidGameBoard.playSound("./sounds/laser.aiff");
+				Utilities.playSound("./sounds/laser.aiff");
 			}
 		} 
 		
 		
 		if (e.getKeyChar() == 'p') {
+			if(!(AsteroidGameBoard.gameOver ==true || !AsteroidGameBoard.ifAnyAsteroidsLeft(AsteroidGameBoard.asteroids))) {
 			if (AsteroidGameBoard.pausedTimes % 2 == 0) {
 				AsteroidGameBoard.pausedTimes++;
 				AsteroidGameBoard.paused= true;
@@ -39,7 +40,7 @@ public class KeyManager implements KeyListener{
 				AsteroidGameBoard.paused = false;
 				AsteroidGameBoard.pausedTimes--;
 			}
-
+			}
 		} 
 		
 		if (e.getKeyChar() == 'w' || e.getKeyChar() == 'a' || e.getKeyChar() == 's'

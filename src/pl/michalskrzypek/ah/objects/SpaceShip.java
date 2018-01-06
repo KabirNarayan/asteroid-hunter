@@ -23,11 +23,11 @@ public class SpaceShip extends Polygon {
 	// Will hold the x & y coordinates for the ship
 	// Everything is based on coordinates from the center
 	// It is done this way so that rotation works properly
-	private static int[] polyXArray = { -13, 14, -13, -5, -13 };
+	private static int[] polyXArray = { -20, 20, -20, -10, -20 };
 	private static int[] polyYArray = { -15, 0, 15, 0, -15 };
 
 	// Width and height of ship
-	private int shipWidth = 27, shipHeight = 30;
+	private int shipWidth = 40, shipHeight = 30;
 
 	// Upper left hand corner of space ship
 	private double uLeftXPos = getXCenter() + this.polyXArray[0];

@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -26,13 +29,20 @@ public class InitialScreen extends JFrame {
 	JDialog instructionDialog;
 	private String informationString;
 	private static String level = "Easy";
-
+	Clip clip = null;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		new InitialScreen();
 	}
 
 	public InitialScreen() {
+
+		try {
+			clip = AudioSystem.getClip();
+		} catch (LineUnavailableException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try {
 			background = ImageIO.read(new File("./images/menu.jpg"));
 		} catch (IOException e1) {
@@ -56,10 +66,13 @@ public class InitialScreen extends JFrame {
 				String name = JOptionPane.showInputDialog(InitialScreen.this, "Please enter your name", null,
 						JOptionPane.QUESTION_MESSAGE);
 				
+				if(name != null) {
 				name = name.trim();
+				}
 				
 				if (name != null && name.length()>=3){
 					InitialScreen.this.dispose();
+					Utilities.stopBackgroundMusic(clip);
 					new AsteroidGameBoard(name);
 				}
 				
@@ -76,7 +89,6 @@ public class InitialScreen extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				JOptionPane.showMessageDialog(InitialScreen.this, new String(informationString), "Instruction",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -120,6 +132,8 @@ public class InitialScreen extends JFrame {
 
 		this.add(startGameButton);
 		this.add(exitGameButton);
+
+		Utilities.playBackgroundMusic(clip, "./sounds/intro.wav");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
 	}

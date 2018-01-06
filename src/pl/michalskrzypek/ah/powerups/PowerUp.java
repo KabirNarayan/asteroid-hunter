@@ -4,14 +4,16 @@ import java.awt.Rectangle;
 
 public interface PowerUp {
 
-	public void move();
-
 	// Bounds for collision detection
 	public Rectangle getBounds();
 
 	public void setYVelovity(double yVel);
 
 	public double getYVelocity();
+	
+	public void setXVelovity(double yVel);
+
+	public double getXVelocity();
 
 	public double getXCenter();
 

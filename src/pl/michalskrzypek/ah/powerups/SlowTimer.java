@@ -1,84 +1,53 @@
 package pl.michalskrzypek.ah.powerups;
 
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
+import pl.michalskrzypek.ah.main.Utilities;
 import pl.michalskrzypek.ah.objects.Asteroid;
 
 @SuppressWarnings("serial")
-public class SlowTimer extends Polygon implements PowerUp {
+public class SlowTimer extends PolygonPowerUp {
 
-	private boolean onScreen;
 	private static int[] polygonXCoordinates = { -8, 8, 8, -8, -8 };
 	private static int[] polygonYCoordinates = { -8, -8, 8, 8, -8 };
-	private static int numberOfCorners = 5;
-	double centerX;
-	double centerY;
+private static int numberOfCorners = 5;
+	
 	private double yVelocity = 2;
-
-	public static int brokenAsteroids = 0;
-	public static int howMany = 0;
-	public int which = 0;
-
-	public SlowTimer(int[] polygonXCoordinates) {
-		super(polygonXCoordinates, polygonYCoordinates, numberOfCorners);
-		onScreen = true;
+	
+	
+	public SlowTimer(int[] polyXCoordinates) {
+		super(polyXCoordinates, polygonYCoordinates, numberOfCorners);
 	}
-
-	// Bounds for collision detection
+	
+	@Override
 	public Rectangle getBounds() {
-		return new Rectangle(this.xpoints[0], this.ypoints[0], 40, 30);
+		// TODO Auto-generated method stub
+		return new Rectangle(this.xpoints[0], this.ypoints[0], 20,20);
 	}
 
-	public void setOnScreen(boolean bool) {
-		this.onScreen = bool;
-	}
+	
+	public static int[] getInitialXPosition(int randomInitialXPosition) {
+		int[] tempXPosition = (int[]) polygonXCoordinates.clone();
+		for (int i = 0; i < tempXPosition.length; i++) {
+			tempXPosition[i] += randomInitialXPosition;
+		}
 
-	public boolean getOnScreen() {
-		return this.onScreen;
+		return tempXPosition;
 	}
-
-	public void setYVelovity(double yVel) {
-		this.yVelocity = yVel;
-	}
-
-	public double getYVelocity() {
-		return this.yVelocity;
-	}
-
-	public double getXCenter() {
-		return centerX;
-	}
-
-	public double getYCenter() {
-		return centerY;
-	}
-
-	public void setXCenter(double xCent) {
-		this.centerX = xCent;
-	}
-
-	public void setYCenter(double yCent) {
-		this.centerY = yCent;
-	}
-
-	public int[] getPolyYCoordinates() {
-		return polygonYCoordinates;
-	}
+	
 
 	public void move() {
-		if (this.onScreen == true) {
+		if (this.getOnScreen()== true) {
 			Rectangle rectToCheck = this.getBounds();
 			Rectangle shipBounds = AsteroidGameBoard.ship.getBounds();
 
 			for (SlowTimer st : AsteroidGameBoard.slowTimers) {
-				if (st.onScreen == true) {
+				if (st.getOnScreen() == true) {
 					Rectangle otherRect = st.getBounds();
 					Point p3 = otherRect.getLocation();
 
@@ -87,7 +56,7 @@ public class SlowTimer extends Polygon implements PowerUp {
 						st.setOnScreen(false);
 
 						AsteroidGameBoard.slowTime = true;
-						AsteroidGameBoard.playSound("./sounds/collect.wav");
+						Utilities.playSound("./sounds/collect.wav");
 
 						// ArrayList<Double> asteroidsXVelo = new
 						// ArrayList<Double>(AsteroidGameBoard.asteroids.size());
@@ -96,16 +65,8 @@ public class SlowTimer extends Polygon implements PowerUp {
 						for (Asteroid as : AsteroidGameBoard.asteroids) {
 							// asteroidsXVelo.add(Math.abs(as.getXVelocity()));
 							// asteroidsYVelo.add(Math.abs(as.getYVelocity()));
-							as.setXVelovity(as.getXVelocity() * 0.5);
-							as.setYVelovity(as.getYVelocity() * 0.5);
-							
-							if (as.getXVelocity() >= 2) {
-						
-							}
-
-							if (as.getYVelocity() >= 2) {
-
-							}
+							as.setXVelocity(as.getXVelocity() * 0.5);
+							as.setYVelocity(as.getYVelocity() * 0.5);
 
 						}
 
@@ -117,8 +78,8 @@ public class SlowTimer extends Polygon implements PowerUp {
 								// TODO Auto-generated method stub
 								AsteroidGameBoard.slowTime = false;
 								for (Asteroid as : AsteroidGameBoard.asteroids) {
-									as.setXVelovity(as.getXVelocity() * 2);
-									as.setYVelovity(as.getYVelocity() * 2);
+									as.setXVelocity(as.getXVelocity() * 2);
+									as.setYVelocity(as.getYVelocity() * 2);
 								}
 
 							}
@@ -139,13 +100,8 @@ public class SlowTimer extends Polygon implements PowerUp {
 		}
 	}
 
-	public static int[] getInitialXPosition(int randomInitialXPosition) {
-		int[] tempXPosition = (int[]) polygonXCoordinates.clone();
-		for (int i = 0; i < tempXPosition.length; i++) {
-			tempXPosition[i] += randomInitialXPosition;
-		}
 
-		return tempXPosition;
-	}
+
+
 
 }

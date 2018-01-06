@@ -7,8 +7,8 @@ import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 public class Bullet extends Polygon {
 
 	// Get the board width and height
-	int gBWidth = AsteroidGameBoard.frameWidth;
-	int gBHeight = AsteroidGameBoard.frameHeight;
+	private int gBWidth = AsteroidGameBoard.frameWidth;
+	private int gBHeight = AsteroidGameBoard.frameHeight;
 
 	// Center of bullet
 	private double centerX = 0, centerY = 0;
@@ -22,7 +22,7 @@ public class Bullet extends Polygon {
 	private int bulletWidth = 6, bulletHeight = 6;
 
 	// Keep track of whether bullet is on screen
-	public boolean onScreen = false;
+	private boolean onScreen = false;
 
 	// The angle the bullet moves on the screen
 	private double movingAngle = 0;
@@ -49,6 +49,14 @@ public class Bullet extends Polygon {
 
 	}
 
+	public void setOnScreen (boolean onScr) {
+		this.onScreen = onScr;
+	}
+	
+	public boolean getOnScreen () {
+		return this.onScreen;
+	}
+	
 	// Gets & sets the values for the x & y center of bullet
 
 	public double getXCenter() {
