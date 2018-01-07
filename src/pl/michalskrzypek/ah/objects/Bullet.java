@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 
-public class Bullet extends Polygon {
+public class Bullet extends Polygon implements SpaceObject{
 
 	// Get the board width and height
 	private int gBWidth = AsteroidGameBoard.frameWidth;
@@ -56,32 +56,6 @@ public class Bullet extends Polygon {
 	public boolean getOnScreen () {
 		return this.onScreen;
 	}
-	
-	// Gets & sets the values for the x & y center of bullet
-
-	public double getXCenter() {
-		return centerX;
-	}
-
-	public double getYCenter() {
-		return centerY;
-	}
-
-	public void setXCenter(double xCent) {
-		this.centerX = xCent;
-	}
-
-	public void setYCenter(double yCent) {
-		this.centerY = yCent;
-	}
-
-	public void changeXPos(double incAmt) {
-		this.centerX += incAmt;
-	}
-
-	public void changeYPos(double incAmt) {
-		this.centerY += incAmt;
-	}
 
 	// Gets, sets, the bullet velocity
 
@@ -121,8 +95,34 @@ public class Bullet extends Polygon {
 		return movingAngle;
 	}
 
-	// Artificial rectangle that is used for collision detection
+	// Gets & sets the values for the x & y center of bullet
 
+	public double getXCenter() {
+		return centerX;
+	}
+
+	public double getYCenter() {
+		return centerY;
+	}
+
+	public void setXCenter(double xCent) {
+		this.centerX = xCent;
+	}
+
+	public void setYCenter(double yCent) {
+		this.centerY = yCent;
+	}
+
+	public void changeXPos(double incAmt) {
+		this.centerX += incAmt;
+	}
+
+	public void changeYPos(double incAmt) {
+		this.centerY += incAmt;
+	}
+	
+	
+	// Artificial rectangle that is used for collision detection
 	public Rectangle getBounds() {
 
 		return new Rectangle((int) this.getXCenter() - 3,
@@ -161,5 +161,30 @@ public class Bullet extends Polygon {
 			this.onScreen = false;
 			AsteroidGameBoard.currentBullets--;
 		}
+	}
+
+	//velocity remains the same for a bullet so i dont override following methods
+	@Override
+	public void increaseXVelocity(double incAmt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void decreaseXVelocity(double incAmt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void increaseYVelocity(double incAmt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void decreaseYVelocity(double incAmt) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -205,9 +205,9 @@ try {
 	}
 
 	private static void initiateHighScoresFiles() {
-		File highScoresEasy = new File("./src/high_scores_easy.txt");
-		File highScoresMedium = new File("./src/high_scores_medium.txt");
-		File highScoresHard = new File("./src/high_scores_hard.txt");
+		File highScoresEasy = new File("./scores/high_scores_easy.txt");
+		File highScoresMedium = new File("./scores/high_scores_medium.txt");
+		File highScoresHard = new File("./scores/high_scores_hard.txt");
 		// readers and writers needed to save and read the high scores
 
 		if (InitialScreen.getLevel().equals("Easy")) {
@@ -787,7 +787,7 @@ try {
 					g2.setPaint(new Color(152, 152, 152));
 					g2.fill(ship);*/
 
-					g2.drawImage(spaceShipImage, ship.xpoints[0], ship.ypoints[0], ship.getShipWidth(), ship.getShipHeight(), this);
+					g2.drawImage(spaceShipImage, ship.xpoints[0], ship.ypoints[0], ship.getWidth(), ship.getHeight(), this);
 					// Drawing bullets
 					g2.setPaint(Color.RED);
 					for (Bullet bullet : AsteroidGameBoard.bulletList) {

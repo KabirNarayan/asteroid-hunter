@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 public abstract class PolygonPowerUp extends Polygon implements PowerUp {
 
 	private boolean onScreen;
+	private static int[] polygonXCoordinates;
 	private static int[] polygonYCoordinates;
 	private double centerX;
 	private double centerY;
@@ -18,6 +19,7 @@ public abstract class PolygonPowerUp extends Polygon implements PowerUp {
 	public PolygonPowerUp(int[] polyXCoordinates, int[] polyYCoordinates, int numberOfCorners) {
 		super(polyXCoordinates, polyYCoordinates, numberOfCorners);
 		
+		polygonXCoordinates = polyXCoordinates;
 		polygonYCoordinates = polyYCoordinates;
 		
 		
@@ -72,5 +74,9 @@ public abstract class PolygonPowerUp extends Polygon implements PowerUp {
 	
 	public int[] getPolyYCoordinates() {
 		return polygonYCoordinates;
+	}
+	
+	public int[] getPolyXCoordinates() {
+		return polygonXCoordinates;
 	}
 }

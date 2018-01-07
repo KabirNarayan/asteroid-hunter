@@ -4,7 +4,7 @@ import java.awt.*;
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 
 @SuppressWarnings("serial")
-public class SpaceShip extends Polygon {
+public class SpaceShip extends Polygon  implements SpaceObject{
 
 	// Determines the speed the ship moves
 	private double xVelocity = 2, yVelocity = 0;
@@ -14,8 +14,8 @@ public class SpaceShip extends Polygon {
 	private int lives = 5;
 
 	// Get the board width and height
-	int gBWidth = AsteroidGameBoard.frameWidth;
-	int gBHeight = AsteroidGameBoard.frameHeight;
+	private int gBWidth = AsteroidGameBoard.frameWidth;
+	private int gBHeight = AsteroidGameBoard.frameHeight;
 
 	// Center of space ship
 	private double centerX = gBWidth / 2 + 50, centerY = gBHeight / 2 - 50;
@@ -36,6 +36,8 @@ public class SpaceShip extends Polygon {
 	// Defines if the ship should rotate
 	private double rotationAngle = 0, movingAngle = 0;
 
+	private boolean onScreen = true;
+	
 	// Creates a new space ship with specified amount of lives
 	public SpaceShip() {
 		// Creates a Polygon by calling the super class Polygon
@@ -102,11 +104,11 @@ public class SpaceShip extends Polygon {
 		this.uLeftYPos = yULPos;
 	}
 
-	public int getShipWidth() {
+	public int getWidth() {
 		return shipWidth;
 	}
 
-	public int getShipHeight() {
+	public int getHeight() {
 		return shipHeight;
 	}
 
@@ -203,7 +205,7 @@ public class SpaceShip extends Polygon {
 	public Rectangle getBounds() {
 
 		return new Rectangle((int) getXCenter() - 14, (int) getYCenter() - 15,
-				getShipWidth(), getShipHeight());
+				getWidth(), getHeight());
 
 	}
 
@@ -238,5 +240,18 @@ public class SpaceShip extends Polygon {
 		}
 
 	}
+
+	@Override
+	public void setOnScreen(boolean onScr) {
+		// TODO Auto-generated method stub
+		this.onScreen = onScr;
+	}
+
+	@Override
+	public boolean getOnScreen() {
+		// TODO Auto-generated method stub
+		return this.onScreen;
+	}
+
 
 }

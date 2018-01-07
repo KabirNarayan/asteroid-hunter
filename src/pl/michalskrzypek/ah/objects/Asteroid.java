@@ -8,29 +8,30 @@ import java.util.ArrayList;
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 import pl.michalskrzypek.ah.main.Collision;
 
-public class Asteroid extends Polygon {
+public class Asteroid extends Polygon implements SpaceObject {
 
 	private static double speed;
-	private boolean onScreen;
+	
 	private static int[] polygonXCoordinates = { -20, -10, -1, 0, 10, 8, 20, 4, -2,
 			-10, -20 };
 	private static int[] polygonYCoordinates = { -5, -13, -10, -20, -7, -3, 5, 20, 8,
 			12, -5 };
-private int width = 40;
-private int height = 40;
 
 	private double xVelocity = 0; 
 	private double yVelocity = 0;
-
-private static int howMany = 0;
-	private int which = 0;
+	private int width = 40;
+	private int height = 40;
+	
+	private boolean onScreen;
 	
 	public Asteroid(int[] polygonXCoordinates, int[] polygonYCoordinates,
 			int numberOfCorners) {
 		super(polygonXCoordinates, polygonYCoordinates, numberOfCorners);
 
+		
 		this.xVelocity = (Math.random() * speed) + 1;
 		this.yVelocity = (Math.random() * speed) + 1;
+		
 		onScreen = true;
 	}
 
@@ -46,7 +47,7 @@ private static int howMany = 0;
 	public int getHeight() {
 		return this.height;
 	}
-
+	
 	public void setOnScreen(boolean bool){
 		this.onScreen = bool;
 	}
@@ -54,6 +55,7 @@ private static int howMany = 0;
 	public boolean getOnScreen(){
 		return this.onScreen;
 	}
+	
 	
 	public void setXVelocity(double xVel){
 		this.xVelocity = xVel;
@@ -71,6 +73,7 @@ private static int howMany = 0;
 		return this.yVelocity;
 	}
 	
+	
 	public void increaseXVelocity(double incAmt) {
 		this.xVelocity += incAmt;
 	}
@@ -86,18 +89,18 @@ public void increaseYVelocity(double incAmt) {
 public void decreaseYVelocity(double incAmt) {
 	this.yVelocity -= incAmt;
 }
-
-public double asteroidXMoveAngle(double xMoveAngle) {
+	
+public double setXMoveAngle(double xMoveAngle) {
 
 	return (double) (Math.cos(xMoveAngle * Math.PI / 180));
 
 }
 
-public double asteroidYMoveAngle(double yMoveAngle) {
+public double setYMoveAngle(double yMoveAngle) {
 
 	return (double) (Math.sin(yMoveAngle * Math.PI / 180));
 
-}
+}	
 
 	
 	public void move() {

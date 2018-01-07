@@ -29,14 +29,6 @@ public class Freezer extends PolygonPowerUp {
 		
 	}
 	
-	public static int[] getInitialXPosition(int randomInitialXPosition) {
-		int[] tempXPosition = (int[]) polygonXCoordinates.clone();
-		for (int i = 0; i < tempXPosition.length; i++) {
-			tempXPosition[i] += randomInitialXPosition;
-		}
-
-		return tempXPosition;
-	}
 	
 	@Override
 	public Rectangle getBounds() {
@@ -83,7 +75,15 @@ public class Freezer extends PolygonPowerUp {
 			}
 		}
 	}
+	
+	public static int[] getInitialXPosition(int randomInitialXPosition) {
+		int[] tempXPosition = (int[]) polygonXCoordinates.clone();
+		for (int i = 0; i < tempXPosition.length; i++) {
+			tempXPosition[i] += randomInitialXPosition;
+		}
 
+		return tempXPosition;
+	}
 
 
 }

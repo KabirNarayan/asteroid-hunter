@@ -30,16 +30,6 @@ private static int numberOfCorners = 5;
 		return new Rectangle(this.xpoints[0], this.ypoints[0], 20,20);
 	}
 
-	
-	public static int[] getInitialXPosition(int randomInitialXPosition) {
-		int[] tempXPosition = (int[]) polygonXCoordinates.clone();
-		for (int i = 0; i < tempXPosition.length; i++) {
-			tempXPosition[i] += randomInitialXPosition;
-		}
-
-		return tempXPosition;
-	}
-	
 
 	public void move() {
 		if (this.getOnScreen()== true) {
@@ -100,7 +90,15 @@ private static int numberOfCorners = 5;
 		}
 	}
 
+	public static int[] getInitialXPosition(int randomInitialXPosition) {
+		int[] tempXPosition = (int[]) polygonXCoordinates.clone();
+		for (int i = 0; i < tempXPosition.length; i++) {
+			tempXPosition[i] += randomInitialXPosition;
+		}
 
+		return tempXPosition;
+	}
+	
 
 
 
