@@ -4,14 +4,14 @@ import java.awt.Rectangle;
 
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 
-public class Bullet extends Polygon implements SpaceObject{
+public class Bullet extends SpaceObject{
 
 	// Get the board width and height
 	private int gBWidth = AsteroidGameBoard.frameWidth;
 	private int gBHeight = AsteroidGameBoard.frameHeight;
 
 	// Center of bullet
-	private double centerX = 0, centerY = 0;
+/*	private double centerX = 0, centerY = 0;*/
 
 	// Will hold the x & y coordinates for the bullet
 	// Everything is based on coordinates from the center
@@ -21,15 +21,13 @@ public class Bullet extends Polygon implements SpaceObject{
 	// Width and height of bullet
 	private int bulletWidth = 6, bulletHeight = 6;
 
-	// Keep track of whether bullet is on screen
-	private boolean onScreen = false;
 
 	// The angle the bullet moves on the screen
 	private double movingAngle = 0;
 
 	// Determines how quickly the bullet moves on
 	// its assigned path
-	private double xVelocity = 5, yVelocity = 5;
+	/*private double xVelocity = 5, yVelocity = 5;*/
 
 	public Bullet(double shipNoseX, double shipNoseY, double movingAngleOfShip) {
 
@@ -38,51 +36,17 @@ public class Bullet extends Polygon implements SpaceObject{
 
 		// Defines the center based on the vectors of
 		// the ships nose. movingAngle is the same as ship
-		this.centerX = shipNoseX;
-		this.centerY = shipNoseY;
+		this.setXCenter(shipNoseX);
+		this.setYCenter(shipNoseY);
 		this.movingAngle = movingAngleOfShip;
 
-		this.onScreen = true;
+		this.setOnScreen(true);
+		this.setWidth(bulletWidth);
+		this.setHeight(bulletHeight);
 		
 		this.setXVelocity(this.bulletXMoveAngle(this.movingAngle) * 10);
 		this.setYVelocity(this.bulletYMoveAngle(this.movingAngle) * 10);
 
-	}
-
-	public void setOnScreen (boolean onScr) {
-		this.onScreen = onScr;
-	}
-	
-	public boolean getOnScreen () {
-		return this.onScreen;
-	}
-
-	// Gets, sets, the bullet velocity
-
-	public double getXVelocity() {
-		return xVelocity;
-	}
-
-	public double getYVelocity() {
-		return yVelocity;
-	}
-
-	public void setXVelocity(double xVel) {
-		this.xVelocity = xVel;
-	}
-
-	public void setYVelocity(double yVel) {
-		this.yVelocity = yVel;
-	}
-
-	// Gets & sets the x & y for upper left hand corner of ship
-
-	public int getWidth() {
-		return bulletWidth;
-	}
-
-	public int getHeight() {
-		return bulletHeight;
 	}
 
 	// Set and increase the bullet movement angle
@@ -95,30 +59,12 @@ public class Bullet extends Polygon implements SpaceObject{
 		return movingAngle;
 	}
 
-	// Gets & sets the values for the x & y center of bullet
-
-	public double getXCenter() {
-		return centerX;
-	}
-
-	public double getYCenter() {
-		return centerY;
-	}
-
-	public void setXCenter(double xCent) {
-		this.centerX = xCent;
-	}
-
-	public void setYCenter(double yCent) {
-		this.centerY = yCent;
-	}
-
 	public void changeXPos(double incAmt) {
-		this.centerX += incAmt;
+		this.setXCenter(this.getXCenter()+incAmt);
 	}
 
 	public void changeYPos(double incAmt) {
-		this.centerY += incAmt;
+		this.setYCenter(this.getYCenter() + incAmt);
 	}
 	
 	
@@ -149,7 +95,7 @@ public class Bullet extends Polygon implements SpaceObject{
 		this.changeXPos(this.getXVelocity());
 
 		if (this.getXCenter() < 0 || this.getXCenter() > gBWidth) {
-			this.onScreen = false;
+			this.setOnScreen(false);
 			AsteroidGameBoard.currentBullets--;
 		}
 
@@ -158,33 +104,8 @@ public class Bullet extends Polygon implements SpaceObject{
 
 		if (this.getYCenter() < 0 || this.getYCenter() > gBHeight) {
 
-			this.onScreen = false;
+		this.setOnScreen(false);
 			AsteroidGameBoard.currentBullets--;
 		}
-	}
-
-	//velocity remains the same for a bullet so i dont override following methods
-	@Override
-	public void increaseXVelocity(double incAmt) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void decreaseXVelocity(double incAmt) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void increaseYVelocity(double incAmt) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void decreaseYVelocity(double incAmt) {
-		// TODO Auto-generated method stub
-		
 	}
 }

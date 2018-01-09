@@ -1,13 +1,14 @@
 package pl.michalskrzypek.ah.objects;
+
 import java.awt.*;
 
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 
 @SuppressWarnings("serial")
-public class SpaceShip extends Polygon  implements SpaceObject{
+public class SpaceShip extends SpaceObject {
 
 	// Determines the speed the ship moves
-	private double xVelocity = 2, yVelocity = 0;
+
 	public final static double MAX_VELOCITY = 4;
 
 	// Total lives of the ship
@@ -18,7 +19,7 @@ public class SpaceShip extends Polygon  implements SpaceObject{
 	private int gBHeight = AsteroidGameBoard.frameHeight;
 
 	// Center of space ship
-	private double centerX = gBWidth / 2 + 50, centerY = gBHeight / 2 - 50;
+	// private double centerX = gBWidth / 2 + 50, centerY = gBHeight / 2 - 50;
 
 	// Will hold the x & y coordinates for the ship
 	// Everything is based on coordinates from the center
@@ -36,15 +37,20 @@ public class SpaceShip extends Polygon  implements SpaceObject{
 	// Defines if the ship should rotate
 	private double rotationAngle = 0, movingAngle = 0;
 
-	private boolean onScreen = true;
-	
 	// Creates a new space ship with specified amount of lives
 	public SpaceShip() {
 		// Creates a Polygon by calling the super class Polygon
 		super(polyXArray, polyYArray, 5);
+		this.setXVelocity(2);
+		this.setYVelocity(0);
+		this.setWidth(shipWidth);
+		this.setHeight(shipHeight);
+		this.setXCenter(gBWidth / 2 + 50);
+		this.setYCenter(gBHeight / 2 - 50);
+		this.setOnScreen(true);
 	}
 
-	// Gets & sets the values ship's lives
+	// Gets & sets ship's lives
 	public int getLives() {
 		return this.lives;
 	}
@@ -52,39 +58,22 @@ public class SpaceShip extends Polygon  implements SpaceObject{
 	public void setLives(int lives) {
 		this.lives = lives;
 	}
-	
-	//Once the ship hit an asteroid it loses one life
+
+	// Once the ship hit an asteroid it loses one life
 	public void takeLife() {
 		this.lives--;
 	}
-	
+
 	public void gainLife() {
 		this.lives++;
 	}
 
-	//Get & Set x and y coordinates for center of the ship
-	public double getXCenter() {
-		return centerX;
-	}
-
-	public double getYCenter() {
-		return centerY;
-	}
-
-	public void setXCenter(double xCent) {
-		this.centerX = xCent;
-	}
-
-	public void setYCenter(double yCent) {
-		this.centerY = yCent;
-	}
-
 	public void increaseXPos(double incAmt) {
-		this.centerX += incAmt;
+		this.setXCenter(this.getXCenter() + incAmt);
 	}
 
 	public void increaseYPos(double incAmt) {
-		this.centerY += incAmt;
+		this.setYCenter(this.getYCenter() + incAmt);
 	}
 
 	// Gets & sets the x & y for upper left hand corner of ship
@@ -102,47 +91,6 @@ public class SpaceShip extends Polygon  implements SpaceObject{
 
 	public void setuLeftYPos(double yULPos) {
 		this.uLeftYPos = yULPos;
-	}
-
-	public int getWidth() {
-		return shipWidth;
-	}
-
-	public int getHeight() {
-		return shipHeight;
-	}
-
-	// Gets, sets, increases and decreases the ship velocity
-	public double getXVelocity() {
-		return xVelocity;
-	}
-
-	public double getYVelocity() {
-		return yVelocity;
-	}
-
-	public void setXVelocity(double xVel) {
-		this.xVelocity = xVel;
-	}
-
-	public void setYVelocity(double yVel) {
-		this.yVelocity = yVel;
-	}
-
-	public void increaseXVelocity(double xVelInc) {
-		this.xVelocity += xVelInc;
-	}
-
-	public void increaseYVelocity(double yVelInc) {
-		this.yVelocity += yVelInc;
-	}
-
-	public void decreaseXVelocity(double xVelDec) {
-		this.xVelocity -= xVelDec;
-	}
-
-	public void decreaseYVelocity(double yVelDec) {
-		this.yVelocity -= yVelDec;
 	}
 
 	// Set and increase the ship movement angle
@@ -184,19 +132,17 @@ public class SpaceShip extends Polygon  implements SpaceObject{
 
 		if (getRotationAngle() >= 355) {
 			rotationAngle = 0;
-		}
-		else {
+		} else {
 			rotationAngle += 5;
 		}
 	}
 
-	// Decrease the rotation angle 
+	// Decrease the rotation angle
 	public void decreaseRotationAngle() {
 
 		if (getRotationAngle() < 0) {
 			rotationAngle = 355;
-		}
-		else {
+		} else {
 			rotationAngle -= 5;
 		}
 	}
@@ -204,8 +150,7 @@ public class SpaceShip extends Polygon  implements SpaceObject{
 	// Bounds of the ship for collision detection
 	public Rectangle getBounds() {
 
-		return new Rectangle((int) getXCenter() - 14, (int) getYCenter() - 15,
-				getWidth(), getHeight());
+		return new Rectangle((int) getXCenter() - 14, (int) getYCenter() - 15, getWidth(), getHeight());
 
 	}
 
@@ -240,18 +185,5 @@ public class SpaceShip extends Polygon  implements SpaceObject{
 		}
 
 	}
-
-	@Override
-	public void setOnScreen(boolean onScr) {
-		// TODO Auto-generated method stub
-		this.onScreen = onScr;
-	}
-
-	@Override
-	public boolean getOnScreen() {
-		// TODO Auto-generated method stub
-		return this.onScreen;
-	}
-
 
 }

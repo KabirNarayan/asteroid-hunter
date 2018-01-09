@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.rmi.CORBA.Util;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
@@ -62,7 +63,7 @@ public class InitialScreen extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-
+				Utilities.playSound("./sounds/click.wav");
 				String name = JOptionPane.showInputDialog(InitialScreen.this, "Please enter your name", null,
 						JOptionPane.QUESTION_MESSAGE);
 				
@@ -89,6 +90,7 @@ public class InitialScreen extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				Utilities.playSound("./sounds/click.wav");
 				JOptionPane.showMessageDialog(InitialScreen.this, new String(informationString), "Instruction",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -103,6 +105,8 @@ public class InitialScreen extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
+				Utilities.playSound("./sounds/click.wav");
+				
 				int option = JOptionPane.showOptionDialog(InitialScreen.this, new String("Select level:"), "",
 						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 				if (option == 0) {
@@ -125,7 +129,7 @@ public class InitialScreen extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				Utilities.playSound("./sounds/click.wav");
 				System.exit(0);
 			}
 		});
