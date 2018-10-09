@@ -12,8 +12,8 @@ public class Asteroid extends SpaceObject {
 	private static int[] polygonXCoordinates = { -20, -10, -1, 0, 10, 8, 20, 4, -2, -10, -20 };
 	private static int[] polygonYCoordinates = { -5, -13, -10, -20, -7, -3, 5, 20, 8, 12, -5 };
 
-	private int width = 40;
-	private int height = 40;
+	private static final int ASTEROID_WIDTH = 40;
+	private static final int ASTEROID_HEIGHT = 40;
 
 	public Asteroid(int[] polygonXCoordinates, int[] polygonYCoordinates, int numberOfCorners) {
 		super(polygonXCoordinates, polygonYCoordinates, numberOfCorners);
@@ -21,8 +21,8 @@ public class Asteroid extends SpaceObject {
 		this.setXVelocity(Math.random() * speed + 1);
 		this.setYVelocity(Math.random() * speed + 1);
 
-		this.setWidth(width);
-		this.setHeight(height);
+		this.setWidth(ASTEROID_WIDTH);
+		this.setHeight(ASTEROID_HEIGHT);
 
 		this.setOnScreen(true);
 		;

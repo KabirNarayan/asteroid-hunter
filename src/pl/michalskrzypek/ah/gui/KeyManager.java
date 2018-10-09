@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import pl.michalskrzypek.ah.spaceobjects.Bullet;
+import pl.michalskrzypek.ah.utils.SoundUtil;
 
 public class KeyManager implements KeyListener {
 
@@ -22,7 +23,7 @@ public class KeyManager implements KeyListener {
 				AsteroidGameBoard.bulletList.add(new Bullet(AsteroidGameBoard.ship.getShipNoseX(),
 						AsteroidGameBoard.ship.getShipNoseY(), AsteroidGameBoard.ship.getRotationAngle()));
 				AsteroidGameBoard.currentBullets++;
-				Utilities.playSound("./sounds/laser.aiff");
+				SoundUtil.playSound("./sounds/laser.aiff");
 			}
 		}
 		

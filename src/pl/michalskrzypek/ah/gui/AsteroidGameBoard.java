@@ -38,12 +38,14 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import pl.michalskrzypek.ah.logic.Collision;
 import pl.michalskrzypek.ah.spaceobjects.Asteroid;
 import pl.michalskrzypek.ah.spaceobjects.Bullet;
 import pl.michalskrzypek.ah.spaceobjects.Planet;
 import pl.michalskrzypek.ah.spaceobjects.SpaceShip;
 import pl.michalskrzypek.ah.spaceobjects.powerups.Freezer;
 import pl.michalskrzypek.ah.spaceobjects.powerups.SlowTimer;
+import pl.michalskrzypek.ah.utils.SoundUtil;
 
 /*
  * Class responsible for the main game functions and thread managing
@@ -134,7 +136,7 @@ public class AsteroidGameBoard extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Utilities.stopBackgroundMusic(clip);
+				SoundUtil.stopBackgroundMusic(clip);
 				playAgain();
 			}
 		});
@@ -147,7 +149,7 @@ public class AsteroidGameBoard extends JFrame {
 				// TODO Auto-generated method stub
 
 				AsteroidGameBoard.this.dispose();
-				Utilities.stopBackgroundMusic(clip);
+				SoundUtil.stopBackgroundMusic(clip);
 				executor.shutdown();
 				executorPU.shutdown();
 				new InitialScreen();
@@ -174,7 +176,7 @@ public class AsteroidGameBoard extends JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		Utilities.playBackgroundMusic(clip, "./sounds/background.wav");
+		SoundUtil.playBackgroundMusic(clip, "./sounds/background.wav");
 		this.setVisible(true);
 	}
 
@@ -224,25 +226,14 @@ public class AsteroidGameBoard extends JFrame {
 		String name = JOptionPane.showInputDialog(AsteroidGameBoard.this, "Please enter your name", "Enter player name",
 				JOptionPane.QUESTION_MESSAGE);
 
-		String[] options = { "Easy", "Medium", "Hard" };
-
 		if (name != null) {
 			name = name.trim();
-
 			if (name.length() >= 3) {
 
 				int option = JOptionPane.showOptionDialog(AsteroidGameBoard.this, new String("Select level:"), "",
-						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
-				if (option == 0) {
-					InitialScreen.setLevel("Easy");
-				}
-				if (option == 1) {
-					InitialScreen.setLevel("Medium");
-				}
-				if (option == 2) {
-					InitialScreen.setLevel("Hard");
-				}
+						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, InitialScreen.GAME_LEVELS,
+						InitialScreen.GAME_LEVELS[0]);
+				InitialScreen.setLevel(option);
 
 				if (option != -1) {
 					playerName = name;
@@ -250,10 +241,9 @@ public class AsteroidGameBoard extends JFrame {
 					try {
 						clip = AudioSystem.getClip();
 					} catch (LineUnavailableException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					Utilities.playBackgroundMusic(clip, "./sounds/background.wav");
+					SoundUtil.playBackgroundMusic(clip, "./sounds/background.wav");
 					freezers.clear();
 					slowTimers.clear();
 					generateAsteroids();
@@ -264,9 +254,7 @@ public class AsteroidGameBoard extends JFrame {
 					closed = false;
 					collisionPoint = null;
 					ship = new SpaceShip();
-				}
-
-				else {
+				} else {
 					paused = false;
 				}
 			} else {
@@ -316,47 +304,36 @@ public class AsteroidGameBoard extends JFrame {
 
 	// Generates a freezer power up every 7 seconds
 	public static void generateSlowTimers() {
+		executorPU.scheduleAtFixedRate(() -> {
+			int counter = 0;
 
-		executorPU.scheduleAtFixedRate(new Runnable() {
-
-			@Override
-			public void run() {
-
-				int counter = 0;
-
-				// checking if there is any slow timer on the screen. If not it generates one
-				// (every 10 seconds)
-				for (SlowTimer s : AsteroidGameBoard.slowTimers) {
-					if (s.getOnScreen()) {
-						counter++;
-					}
+			// checking if there is any slow timer on the screen. If not it generates one
+			// (every 10 seconds)
+			for (SlowTimer s : AsteroidGameBoard.slowTimers) {
+				if (s.getOnScreen()) {
+					counter++;
 				}
-
-				if (counter == 0 && generate) {
-					int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
-
-					while ((randomXInitialPos >= frameWidth / 2 - 50 && randomXInitialPos <= frameWidth / 2 + 50)) {
-						randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
-					}
-
-					SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos));
-					slowTimers.add(st);
-				}
-				counter = 0;
 			}
+
+			if (counter == 0 && generate) {
+				int randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
+
+				while ((randomXInitialPos >= frameWidth / 2 - 50 && randomXInitialPos <= frameWidth / 2 + 50)) {
+					randomXInitialPos = (int) (Math.random() * (frameWidth - 50)) + 21;
+				}
+
+				SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos));
+				slowTimers.add(st);
+			}
+			counter = 0;
 		}, 3, 10, TimeUnit.SECONDS);
 	}
 
 	// Generates a freezer power up every 10 seconds
 	public static void generateFreezers() {
-
-		executorPU.scheduleAtFixedRate(new Runnable() {
-
-			@Override
-			public void run() {
-
+		executorPU.scheduleAtFixedRate(() -> {
 				int counter = 0;
-
+				
 				// checking if there is any freezer on the screen. If not it generates one
 				// (every 14 seconds)
 				for (Freezer f : AsteroidGameBoard.freezers) {
@@ -376,50 +353,9 @@ public class AsteroidGameBoard extends JFrame {
 					freezers.add(fr);
 				}
 				counter = 0;
-			}
 		}, 7, 14, TimeUnit.SECONDS);
 	}// END of generateFreezers method
 
-	/*
-	 * Adding gravity force to every asteroid on the board
-	 * 
-	 * @param thePlanet the planet around which asteroids float
-	 **/
-	/*
-	 * public static void asteroidGravityForce(Planet thePlanet) {
-	 * 
-	 * Rectangle2D planetBounds = thePlanet.getBounds2D();
-	 * 
-	 * for (Asteroid asteroid : AsteroidGameBoard.asteroids) { double angleRadians =
-	 * Math.atan2(asteroid.getBounds().getCenterY() - thePlanet.getyCenter(),
-	 * asteroid.getBounds().getCenterX() - thePlanet.getxCenter()); double
-	 * angleDegrees = Math.toDegrees(angleRadians); if (angleDegrees < 0) {
-	 * angleDegrees = angleDegrees + 360; }
-	 * 
-	 * double force = 0.05;
-	 * 
-	 * if (angleDegrees <= 180) { if (angleDegrees <= 90) { if
-	 * (asteroid.getXVelocity() >= -3 && asteroid.getYVelocity() >= -3) {
-	 * asteroid.decreaseXVelocity(asteroid.asteroidXMoveAngle(angleDegrees)*force);
-	 * asteroid.decreaseYVelocity(asteroid.asteroidYMoveAngle(angleDegrees)*force);
-	 * } } else { if (asteroid.getXVelocity() <= 3 && asteroid.getYVelocity() >= -3)
-	 * {
-	 * asteroid.decreaseXVelocity(asteroid.asteroidXMoveAngle(angleDegrees)*force);
-	 * asteroid.decreaseYVelocity(asteroid.asteroidYMoveAngle(angleDegrees)*force);
-	 * } } } else if (angleDegrees <= 360) { if (angleDegrees <= 270) { if
-	 * (asteroid.getXVelocity() <= 3 && asteroid.getYVelocity() <= 3) {
-	 * asteroid.decreaseXVelocity(asteroid.asteroidXMoveAngle(angleDegrees)*force);
-	 * asteroid.decreaseYVelocity(asteroid.asteroidYMoveAngle(angleDegrees)*force);
-	 * } } else { if (asteroid.getXVelocity() >= -3 && asteroid.getYVelocity() <= 3)
-	 * {
-	 * asteroid.decreaseXVelocity(asteroid.asteroidXMoveAngle(angleDegrees)*force);
-	 * asteroid.decreaseYVelocity(asteroid.asteroidYMoveAngle(angleDegrees)*force);
-	 * } } }
-	 * 
-	 * }
-	 * 
-	 * }
-	 */
 
 	/*
 	 * Adds gravity force to a ship
@@ -429,7 +365,6 @@ public class AsteroidGameBoard extends JFrame {
 	 * @param thePlanet the planet around which theShip flies
 	 */
 	public static void gravityForce(SpaceShip theShip, Planet thePlanet) {
-
 		Rectangle2D shipBounds = theShip.getBounds2D();
 		Rectangle2D planetBounds = thePlanet.getBounds2D();
 
@@ -501,11 +436,9 @@ public class AsteroidGameBoard extends JFrame {
 
 	public static void getHighScores() {
 		try {
-
 			fr = new FileReader(highScores);
 			br = new BufferedReader(fr);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -519,7 +452,6 @@ public class AsteroidGameBoard extends JFrame {
 		try {
 			line = br.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		while (line != null) {
@@ -775,7 +707,7 @@ public class AsteroidGameBoard extends JFrame {
 					}
 
 				} else if (ship.getLives() <= 0) {
-					Utilities.stopBackgroundMusic(clip);
+					SoundUtil.stopBackgroundMusic(clip);
 
 					gameOverLabel.setText("Game over!");
 
@@ -787,7 +719,7 @@ public class AsteroidGameBoard extends JFrame {
 					gameOver = true;
 
 				} else if (!ifAnyAsteroidsLeft(asteroids)) {
-					Utilities.stopBackgroundMusic(clip);
+					SoundUtil.stopBackgroundMusic(clip);
 
 					if (!closed) {
 						try {

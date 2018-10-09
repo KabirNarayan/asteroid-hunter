@@ -9,7 +9,6 @@ import pl.michalskrzypek.ah.spaceobjects.common.SpaceObject;
 public class SpaceShip extends SpaceObject {
 
 	// Determines the speed the ship moves
-
 	public final static double MAX_VELOCITY = 4;
 
 	// Total lives of the ship
@@ -29,10 +28,11 @@ public class SpaceShip extends SpaceObject {
 	private static int[] polyYArray = { -15, 0, 15, 0, -15 };
 
 	// Width and height of ship
-	private int shipWidth = 40, shipHeight = 30;
+	private static final int SHIP_WIDTH = 40;
+	private static final int SHIP_HEIGHT = 30;
 
 	// Upper left hand corner of space ship
-	private double uLeftXPos = getXCenter() + this.polyXArray[0];
+	private  double uLeftXPos = getXCenter() + this.polyXArray[0];
 	private double uLeftYPos = getYCenter() + this.polyYArray[0];
 
 	// Defines if the ship should rotate
@@ -44,8 +44,8 @@ public class SpaceShip extends SpaceObject {
 		super(polyXArray, polyYArray, 5);
 		this.setXVelocity(2);
 		this.setYVelocity(0);
-		this.setWidth(shipWidth);
-		this.setHeight(shipHeight);
+		this.setWidth(SHIP_WIDTH);
+		this.setHeight(SHIP_HEIGHT);
 		this.setXCenter(gBWidth / 2 + 50);
 		this.setYCenter(gBHeight / 2 - 50);
 		this.setOnScreen(true);

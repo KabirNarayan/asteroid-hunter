@@ -20,7 +20,8 @@ public class Bullet extends SpaceObject {
 	private static int[] polyYArray = { -3, -3, 3, 3, -3 };
 
 	// Width and height of bullet
-	private int bulletWidth = 6, bulletHeight = 6;
+	private static final int BULLET_WIDTH = 6;
+	private static final int BULLET_HEIGHT = 6;
 
 	// The angle the bullet moves on the screen
 	private double movingAngle = 0;
@@ -41,8 +42,8 @@ public class Bullet extends SpaceObject {
 		this.movingAngle = movingAngleOfShip;
 
 		this.setOnScreen(true);
-		this.setWidth(bulletWidth);
-		this.setHeight(bulletHeight);
+		this.setWidth(BULLET_WIDTH);
+		this.setHeight(BULLET_HEIGHT);
 
 		this.setXVelocity(this.bulletXMoveAngle(this.movingAngle) * 10);
 		this.setYVelocity(this.bulletYMoveAngle(this.movingAngle) * 10);

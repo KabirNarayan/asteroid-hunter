@@ -1,4 +1,4 @@
-package pl.michalskrzypek.ah.gui;
+package pl.michalskrzypek.ah.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-public class Utilities {
+public class SoundUtil {
 
 	public static void playSound(String soundSource) {
 		try {
