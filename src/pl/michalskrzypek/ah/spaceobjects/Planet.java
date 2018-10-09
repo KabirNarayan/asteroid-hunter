@@ -12,8 +12,8 @@ public class Planet extends Ellipse2D {
 	private String planetName;
 	private double planetRadius = 100;
 
-	private int xCenter = AsteroidGameBoard.frameWidth/2;
-	private int yCenter = AsteroidGameBoard.frameHeight/2;
+	private int xCenter = AsteroidGameBoard.FRAME_WIDTH/2;
+	private int yCenter = AsteroidGameBoard.FRAME_HEIGHT/2;
 	
 	private Color planetColor = null;
 	

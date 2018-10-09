@@ -43,7 +43,7 @@ public class Freezer extends PolygonPowerUp {
 						}, 5000, TimeUnit.MILLISECONDS);
 					}
 				}
-				if (fr.ypoints[0] > AsteroidGameBoard.frameHeight) {
+				if (fr.ypoints[0] > AsteroidGameBoard.FRAME_HEIGHT) {
 					fr.setOnScreen(false);
 				}
 			}

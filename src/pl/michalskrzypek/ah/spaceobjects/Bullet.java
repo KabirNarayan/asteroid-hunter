@@ -8,8 +8,8 @@ import pl.michalskrzypek.ah.spaceobjects.common.SpaceObject;
 public class Bullet extends SpaceObject {
 
 	// Get the board width and height
-	private int gBWidth = AsteroidGameBoard.frameWidth;
-	private int gBHeight = AsteroidGameBoard.frameHeight;
+	private int gBWidth = AsteroidGameBoard.FRAME_WIDTH;
+	private int gBHeight = AsteroidGameBoard.FRAME_HEIGHT;
 
 	// Center of bullet
 	/* private double centerX = 0, centerY = 0; */

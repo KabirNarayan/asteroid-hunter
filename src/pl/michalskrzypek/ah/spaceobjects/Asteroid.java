@@ -42,10 +42,10 @@ public class Asteroid extends SpaceObject {
 	}
 
 	public void move() {
-		if (super.xpoints[0] <= 0 || super.xpoints[6] >= AsteroidGameBoard.frameWidth) {
+		if (super.xpoints[0] <= 0 || super.xpoints[6] >= AsteroidGameBoard.FRAME_WIDTH) {
 			this.setXVelocity(this.getXVelocity()*(-1));
 		}
-		if (super.ypoints[3] <= 0 || super.ypoints[7] >= AsteroidGameBoard.frameHeight) {
+		if (super.ypoints[3] <= 0 || super.ypoints[7] >= AsteroidGameBoard.FRAME_HEIGHT) {
 			this.setYVelocity(this.getYVelocity()*(-1));
 		}
 		for (int i = 0; i < super.xpoints.length; i++) {

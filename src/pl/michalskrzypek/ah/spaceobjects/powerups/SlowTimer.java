@@ -58,7 +58,7 @@ public class SlowTimer extends PolygonPowerUp {
 
 					}
 				}
-				if (st.ypoints[0] > AsteroidGameBoard.frameHeight) {
+				if (st.ypoints[0] > AsteroidGameBoard.FRAME_HEIGHT) {
 					st.setOnScreen(false);
 				}
 			}

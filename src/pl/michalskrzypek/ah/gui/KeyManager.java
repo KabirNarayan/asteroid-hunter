@@ -19,7 +19,7 @@ public class KeyManager implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if (AsteroidGameBoard.currentBullets < AsteroidGameBoard.maxBullets) {
+			if (AsteroidGameBoard.currentBullets < AsteroidGameBoard.MAX_BULLETS) {
 				AsteroidGameBoard.bulletList.add(new Bullet(AsteroidGameBoard.ship.getShipNoseX(),
 						AsteroidGameBoard.ship.getShipNoseY(), AsteroidGameBoard.ship.getRotationAngle()));
 				AsteroidGameBoard.currentBullets++;

@@ -7,13 +7,10 @@ public abstract class SpaceObject extends Polygon {
 
 	private double xCenter;
 	private double yCenter;
-
 	private double xVelocity;
 	private double yVelocity;
-
 	private int width;
 	private int height;
-
 	private boolean onScreen = true;
 
 	public SpaceObject(int[] polyXArray, int[] polyYArray, int numbOfCorners) {
@@ -55,12 +52,10 @@ public abstract class SpaceObject extends Polygon {
 	}
 
 	public void setOnScreen(boolean onScr) {
-		// TODO Auto-generated method stub
 		this.onScreen = onScr;
 	}
 
 	public boolean getOnScreen() {
-		// TODO Auto-generated method stub
 		return this.onScreen;
 	}
 

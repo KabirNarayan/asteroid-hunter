@@ -9,14 +9,14 @@ import pl.michalskrzypek.ah.spaceobjects.common.SpaceObject;
 public class SpaceShip extends SpaceObject {
 
 	// Determines the speed the ship moves
-	public final static double MAX_VELOCITY = 4;
+	public static final double MAX_VELOCITY = 4;
 
 	// Total lives of the ship
 	private int lives = 5;
 
 	// Get the board width and height
-	private int gBWidth = AsteroidGameBoard.frameWidth;
-	private int gBHeight = AsteroidGameBoard.frameHeight;
+	private int gBWidth = AsteroidGameBoard.FRAME_WIDTH;
+	private int gBHeight = AsteroidGameBoard.FRAME_HEIGHT;
 
 	// Center of space ship
 	// private double centerX = gBWidth / 2 + 50, centerY = gBHeight / 2 - 50;

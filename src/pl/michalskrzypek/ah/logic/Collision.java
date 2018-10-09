@@ -48,8 +48,8 @@ public class Collision {
 						int randomXInitialPos = 0;
 						int randomYInitialPos = 0;
 						for (int i = 0; i < 10; i++) {
-							randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameWidth - 50)) + 21;
-							randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameHeight - 40)) + 16;
+							randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_WIDTH - 50)) + 21;
+							randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_HEIGHT - 40)) + 16;
 						}
 
 						asteroid.xpoints = Asteroid.getInitialXPosition(randomXInitialPos);
@@ -76,8 +76,8 @@ public class Collision {
 						int randomXInitialPos = 0;
 						int randomYInitialPos = 0;
 						for (int i = 0; i < 10; i++) {
-							randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameWidth - 50)) + 21;
-							randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameHeight - 40)) + 16;
+							randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_WIDTH - 50)) + 21;
+							randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_HEIGHT - 40)) + 16;
 						}
 
 						currentAsteroid.xpoints = Asteroid.getInitialXPosition(randomXInitialPos);
@@ -87,12 +87,12 @@ public class Collision {
 				}
 			}
 			if (rectToCheck.getLocation().x < -5
-					|| rectToCheck.getLocation().x + 40 > AsteroidGameBoard.frameWidth + 5) {
+					|| rectToCheck.getLocation().x + 40 > AsteroidGameBoard.FRAME_WIDTH + 5) {
 				int randomXInitialPos = 0;
 				int randomYInitialPos = 0;
 				for (int i = 0; i < 10; i++) {
-					randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameWidth - 50)) + 21;
-					randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameHeight - 40)) + 16;
+					randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_WIDTH - 50)) + 21;
+					randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_HEIGHT - 40)) + 16;
 				}
 
 				currentAsteroid.xpoints = Asteroid.getInitialXPosition(randomXInitialPos);
@@ -100,12 +100,12 @@ public class Collision {
 
 			}
 			if (rectToCheck.getLocation().y < -5
-					|| rectToCheck.getLocation().y + 30 > AsteroidGameBoard.frameHeight + 10) {
+					|| rectToCheck.getLocation().y + 30 > AsteroidGameBoard.FRAME_HEIGHT + 10) {
 				int randomXInitialPos = 0;
 				int randomYInitialPos = 0;
 				for (int i = 0; i < 10; i++) {
-					randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameWidth - 50)) + 21;
-					randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.frameHeight - 40)) + 16;
+					randomXInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_WIDTH - 50)) + 21;
+					randomYInitialPos = (int) (Math.random() * (AsteroidGameBoard.FRAME_HEIGHT - 40)) + 16;
 				}
 
 				currentAsteroid.xpoints = Asteroid.getInitialXPosition(randomXInitialPos);
