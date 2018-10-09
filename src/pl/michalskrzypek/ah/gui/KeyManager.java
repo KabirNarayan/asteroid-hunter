@@ -1,9 +1,9 @@
-package pl.michalskrzypek.ah.main;
+package pl.michalskrzypek.ah.gui;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import pl.michalskrzypek.ah.objects.Bullet;
+import pl.michalskrzypek.ah.spaceobjects.Bullet;
 
 public class KeyManager implements KeyListener {
 

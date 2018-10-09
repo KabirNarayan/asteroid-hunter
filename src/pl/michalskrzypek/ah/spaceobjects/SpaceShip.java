@@ -1,8 +1,9 @@
-package pl.michalskrzypek.ah.objects;
+package pl.michalskrzypek.ah.spaceobjects;
 
 import java.awt.Rectangle;
 
-import pl.michalskrzypek.ah.main.AsteroidGameBoard;
+import pl.michalskrzypek.ah.gui.AsteroidGameBoard;
+import pl.michalskrzypek.ah.spaceobjects.common.SpaceObject;
 
 @SuppressWarnings("serial")
 public class SpaceShip extends SpaceObject {

@@ -1,4 +1,4 @@
-package pl.michalskrzypek.ah.main;
+package pl.michalskrzypek.ah.gui;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
@@ -38,12 +38,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import pl.michalskrzypek.ah.objects.Asteroid;
-import pl.michalskrzypek.ah.objects.Bullet;
-import pl.michalskrzypek.ah.objects.Planet;
-import pl.michalskrzypek.ah.objects.SpaceShip;
-import pl.michalskrzypek.ah.powerups.Freezer;
-import pl.michalskrzypek.ah.powerups.SlowTimer;
+import pl.michalskrzypek.ah.spaceobjects.Asteroid;
+import pl.michalskrzypek.ah.spaceobjects.Bullet;
+import pl.michalskrzypek.ah.spaceobjects.Planet;
+import pl.michalskrzypek.ah.spaceobjects.SpaceShip;
+import pl.michalskrzypek.ah.spaceobjects.powerups.Freezer;
+import pl.michalskrzypek.ah.spaceobjects.powerups.SlowTimer;
 
 /*
  * Class responsible for the main game functions and thread managing

@@ -1,4 +1,4 @@
-package pl.michalskrzypek.ah.objects;
+package pl.michalskrzypek.ah.spaceobjects.common;
 
 import java.awt.Polygon;
 import java.awt.Rectangle;

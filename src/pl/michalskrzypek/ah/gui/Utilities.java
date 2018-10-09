@@ -1,4 +1,4 @@
-package pl.michalskrzypek.ah.main;
+package pl.michalskrzypek.ah.gui;
 
 import java.io.File;
 import java.io.IOException;

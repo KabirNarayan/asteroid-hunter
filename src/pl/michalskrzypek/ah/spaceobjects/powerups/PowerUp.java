@@ -1,4 +1,4 @@
-package pl.michalskrzypek.ah.powerups;
+package pl.michalskrzypek.ah.spaceobjects.powerups;
 
 import java.awt.Rectangle;
 

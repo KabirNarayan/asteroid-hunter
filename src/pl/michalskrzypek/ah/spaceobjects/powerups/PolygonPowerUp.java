@@ -1,4 +1,4 @@
-package pl.michalskrzypek.ah.powerups;
+package pl.michalskrzypek.ah.spaceobjects.powerups;
 
 
 import java.awt.Polygon;
@@ -9,19 +9,18 @@ import java.awt.Rectangle;
 public abstract class PolygonPowerUp extends Polygon implements PowerUp {
 
 	private boolean onScreen;
-	private static int[] polygonXCoordinates;
-	private static int[] polygonYCoordinates;
+	private int[] polygonXCoordinates;
+	private int[] polygonYCoordinates;
 	private double centerX;
 	private double centerY;
 	private double yVelocity = 2;
 	private double xVelocity = 0;
 	
-	public PolygonPowerUp(int[] polyXCoordinates, int[] polyYCoordinates, int numberOfCorners) {
-		super(polyXCoordinates, polyYCoordinates, numberOfCorners);
+	public PolygonPowerUp(int[] polygonXCoordinates, int[] polygonYCoordinates, int numberOfCorners) {
+		super(polygonXCoordinates, polygonYCoordinates, numberOfCorners);
 		
-		polygonXCoordinates = polyXCoordinates;
-		polygonYCoordinates = polyYCoordinates;
-		
+		this.polygonXCoordinates = polygonXCoordinates;
+		this.polygonYCoordinates = polygonYCoordinates;
 		onScreen = true;
 	}
 

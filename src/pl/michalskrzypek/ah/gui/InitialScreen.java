@@ -1,4 +1,4 @@
-package pl.michalskrzypek.ah.main;
+package pl.michalskrzypek.ah.gui;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -38,7 +38,6 @@ public class InitialScreen extends JFrame {
 		try {
 			clip = AudioSystem.getClip();
 		} catch (LineUnavailableException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -73,7 +72,6 @@ public class InitialScreen extends JFrame {
 					Utilities.stopBackgroundMusic(clip);
 					new AsteroidGameBoard(name);
 				}
-				
 				if(name!= null && name.length()<3) {
 					JOptionPane.showMessageDialog(InitialScreen.this, "Name is too short! (min 3 letters)", null, JOptionPane.ERROR_MESSAGE);
 				}

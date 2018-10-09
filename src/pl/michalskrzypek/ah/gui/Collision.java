@@ -1,12 +1,12 @@
-package pl.michalskrzypek.ah.main;
+package pl.michalskrzypek.ah.gui;
 
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import pl.michalskrzypek.ah.objects.Asteroid;
-import pl.michalskrzypek.ah.objects.Bullet;
-import pl.michalskrzypek.ah.objects.SpaceShip;
+import pl.michalskrzypek.ah.spaceobjects.Asteroid;
+import pl.michalskrzypek.ah.spaceobjects.Bullet;
+import pl.michalskrzypek.ah.spaceobjects.SpaceShip;
 
 public class Collision {
 
