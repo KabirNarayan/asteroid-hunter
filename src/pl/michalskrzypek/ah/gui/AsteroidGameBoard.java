@@ -536,7 +536,6 @@ public class AsteroidGameBoard extends JFrame {
 				spaceShipImage = ImageIO.read(new File("./images/spaceship.gif"));
 				earthImage = ImageIO.read(new File("./images/earth.gif"));
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -576,15 +575,6 @@ public class AsteroidGameBoard extends JFrame {
 				if (!gameOver && ship.getLives() > 0 && ifAnyAsteroidsLeft(asteroids)) {
 					timePassed += 15;
 					clip.loop(1);
-					// Drawing a planet
-					/*
-					 * g2.setPaint(thePlanet.getPlanetColor()); g2.draw(thePlanet);
-					 * g2.fill(thePlanet); g2.setPaint(Color.RED); int stringWidth =
-					 * g2.getFontMetrics().stringWidth(thePlanet.getPlanetName());
-					 * g2.drawString(thePlanet.getPlanetName(), (int) thePlanet.getxCenter() -
-					 * stringWidth / 2 + 2, (int) thePlanet.getyCenter() + 5);
-					 */
-
 					g2.drawImage(earthImage, (int) thePlanet.getX(), (int) thePlanet.getY(), (int) thePlanet.getWidth(),
 							(int) thePlanet.getHeight(), null);
 
@@ -602,18 +592,12 @@ public class AsteroidGameBoard extends JFrame {
 									collisionPoint = pt;
 									startTime = timePassed;
 								}
-
 								asteroid.move();
-
-								// asteroidGravityForce(thePlanet);
 							} else {
 								// don't generate new powerups while using one
 								generate = false;
 							}
 							g2.setPaint(Color.LIGHT_GRAY);
-							// g2.draw(asteroid);
-							// g2.setPaint(new Color(108, 67, 40));
-							// g2.fill(asteroid);
 							g2.drawImage(asteroidImage, asteroid.getBounds().x, asteroid.getBounds().y,
 									asteroid.getWidth(), asteroid.getHeight(), this);
 							aLeft++;
@@ -674,12 +658,6 @@ public class AsteroidGameBoard extends JFrame {
 
 					// Rotates the ship
 					g2.rotate(Math.toRadians(ship.getRotationAngle()));
-
-					/*
-					 * g2.setPaint(new Color(32, 32, 32)); g2.draw(ship); g2.setPaint(new Color(152,
-					 * 152, 152)); g2.fill(ship);
-					 */
-
 					g2.drawImage(spaceShipImage, ship.xpoints[0], ship.ypoints[0], ship.getWidth(), ship.getHeight(),
 							this);
 					// Drawing bullets
@@ -695,7 +673,6 @@ public class AsteroidGameBoard extends JFrame {
 							g2.fill(bullet);
 
 							Collision.BulletDetection(bullet, asteroids);
-
 						}
 					}
 
@@ -723,7 +700,6 @@ public class AsteroidGameBoard extends JFrame {
 
 							getHighScores();
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -731,7 +707,6 @@ public class AsteroidGameBoard extends JFrame {
 					g2.setFont(new Font("Aharoni", Font.BOLD, 30));
 					g2.drawString("HIGH SCORES", FRAME_WIDTH / 2 - 80, FRAME_HEIGHT / 4);
 
-					// g2.setColor(new Color(170, 250, 170));
 					g2.setColor(new Color(240, 240, 240));
 					g2.setFont(new Font("Aharoni", Font.PLAIN, 20));
 					g2.drawString(InitialScreen.getLevel() + " level", FRAME_WIDTH / 2 - 80, FRAME_HEIGHT / 4 + 20);
