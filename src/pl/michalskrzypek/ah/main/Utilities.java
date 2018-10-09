@@ -11,20 +11,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Utilities {
 
-	public static void playSound(String soundPath) {
+	public static void playSound(String soundSource) {
 		try {
 			Clip clip = AudioSystem.getClip();
-			AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(soundPath));
+			AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(soundSource));
 			clip.open(inputStream);
 			clip.loop(0);
 			clip.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (LineUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedAudioFileException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		}
 	}
@@ -35,19 +29,12 @@ public class Utilities {
 			clip.open(inputStream);
 			clip.loop(1);
 			clip.start();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (LineUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedAudioFileException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void stopBackgroundMusic(Clip clip) {
-			clip.stop();
+		clip.stop();
 	}
 }

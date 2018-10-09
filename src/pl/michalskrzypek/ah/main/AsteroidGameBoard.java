@@ -2,57 +2,34 @@ package pl.michalskrzypek.ah.main;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Menu;
-import java.awt.MenuBar;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
-import javax.rmi.CORBA.Util;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -60,9 +37,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.Timer;
-
-import com.sun.javafx.scene.traversal.TopMostTraversalEngine;
 
 import pl.michalskrzypek.ah.objects.Asteroid;
 import pl.michalskrzypek.ah.objects.Bullet;
@@ -132,7 +106,7 @@ public class AsteroidGameBoard extends JFrame {
 		closed = false;
 		gameOver = false;
 		timePassed = 0;
-startTime = 0;
+		startTime = 0;
 		// initializing executor for generating power ups
 		executorPU = new ScheduledThreadPoolExecutor(5);
 
@@ -171,7 +145,7 @@ startTime = 0;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+
 				AsteroidGameBoard.this.dispose();
 				Utilities.stopBackgroundMusic(clip);
 				executor.shutdown();
@@ -194,12 +168,12 @@ startTime = 0;
 		});
 		fileMenu.add(exitItem);
 		this.setJMenuBar(menuBar);
-try {
-	clip = AudioSystem.getClip();
-} catch (LineUnavailableException e1) {
-	// TODO Auto-generated catch block
-	e1.printStackTrace();
-}
+		try {
+			clip = AudioSystem.getClip();
+		} catch (LineUnavailableException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		Utilities.playBackgroundMusic(clip, "./sounds/background.wav");
 		this.setVisible(true);
 	}
@@ -678,21 +652,16 @@ try {
 					timePassed += 15;
 					clip.loop(1);
 					// Drawing a planet
-					/*g2.setPaint(thePlanet.getPlanetColor());
-					g2.draw(thePlanet);
-					g2.fill(thePlanet);
-					g2.setPaint(Color.RED);
-					int stringWidth = g2.getFontMetrics().stringWidth(thePlanet.getPlanetName());
-					g2.drawString(thePlanet.getPlanetName(), (int) thePlanet.getxCenter() - stringWidth / 2 + 2,
-							(int) thePlanet.getyCenter() + 5);
-					*/
-					
+					/*
+					 * g2.setPaint(thePlanet.getPlanetColor()); g2.draw(thePlanet);
+					 * g2.fill(thePlanet); g2.setPaint(Color.RED); int stringWidth =
+					 * g2.getFontMetrics().stringWidth(thePlanet.getPlanetName());
+					 * g2.drawString(thePlanet.getPlanetName(), (int) thePlanet.getxCenter() -
+					 * stringWidth / 2 + 2, (int) thePlanet.getyCenter() + 5);
+					 */
 
-
-					g2.drawImage(earthImage, (int)thePlanet.getX(),
-					 (int)thePlanet.getY(), (int)thePlanet.getWidth(),
-					 (int)thePlanet.getHeight(),null);
-					
+					g2.drawImage(earthImage, (int) thePlanet.getX(), (int) thePlanet.getY(), (int) thePlanet.getWidth(),
+							(int) thePlanet.getHeight(), null);
 
 					aLeft = 0;
 
@@ -717,23 +686,22 @@ try {
 								generate = false;
 							}
 							g2.setPaint(Color.LIGHT_GRAY);
-						//	g2.draw(asteroid);
-							//g2.setPaint(new Color(108, 67, 40));
-							//g2.fill(asteroid);
-							g2.drawImage(asteroidImage, asteroid.getBounds().x, asteroid.getBounds().y, asteroid.getWidth(), asteroid.getHeight(), this);
+							// g2.draw(asteroid);
+							// g2.setPaint(new Color(108, 67, 40));
+							// g2.fill(asteroid);
+							g2.drawImage(asteroidImage, asteroid.getBounds().x, asteroid.getBounds().y,
+									asteroid.getWidth(), asteroid.getHeight(), this);
 							aLeft++;
 						}
 					}
-					
-					if(collisionPoint != null && timePassed - startTime < 1000) {
+
+					if (collisionPoint != null && timePassed - startTime < 1000) {
 						float time = 1000 - (timePassed - startTime);
-						float opacity = time/(float)1000;
+						float opacity = time / (float) 1000;
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 						g2.drawImage(explosionImage, collisionPoint.x, collisionPoint.y, 50, 50, this);
 					}
-					
 
-					
 					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 					for (Freezer fr : AsteroidGameBoard.freezers) {
 						if (fr.getOnScreen()) {
@@ -781,13 +749,14 @@ try {
 
 					// Rotates the ship
 					g2.rotate(Math.toRadians(ship.getRotationAngle()));
-					
-					/*g2.setPaint(new Color(32, 32, 32));
-					g2.draw(ship);
-					g2.setPaint(new Color(152, 152, 152));
-					g2.fill(ship);*/
 
-					g2.drawImage(spaceShipImage, ship.xpoints[0], ship.ypoints[0], ship.getWidth(), ship.getHeight(), this);
+					/*
+					 * g2.setPaint(new Color(32, 32, 32)); g2.draw(ship); g2.setPaint(new Color(152,
+					 * 152, 152)); g2.fill(ship);
+					 */
+
+					g2.drawImage(spaceShipImage, ship.xpoints[0], ship.ypoints[0], ship.getWidth(), ship.getHeight(),
+							this);
 					// Drawing bullets
 					g2.setPaint(Color.RED);
 					for (Bullet bullet : AsteroidGameBoard.bulletList) {

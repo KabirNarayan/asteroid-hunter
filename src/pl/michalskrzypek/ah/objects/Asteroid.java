@@ -1,13 +1,8 @@
 package pl.michalskrzypek.ah.objects;
 
-import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
-import pl.michalskrzypek.ah.main.Collision;
 
 public class Asteroid extends SpaceObject {
 
@@ -38,31 +33,23 @@ public class Asteroid extends SpaceObject {
 	}
 
 	public double setXMoveAngle(double xMoveAngle) {
-
 		return (double) (Math.cos(xMoveAngle * Math.PI / 180));
-
 	}
 
 	public double setYMoveAngle(double yMoveAngle) {
-
 		return (double) (Math.sin(yMoveAngle * Math.PI / 180));
-
 	}
 
 	public void move() {
-
 		if (super.xpoints[0] <= 0 || super.xpoints[6] >= AsteroidGameBoard.frameWidth) {
 			this.setXVelocity(this.getXVelocity()*(-1));
 		}
-
 		if (super.ypoints[3] <= 0 || super.ypoints[7] >= AsteroidGameBoard.frameHeight) {
 			this.setYVelocity(this.getYVelocity()*(-1));
 		}
-
 		for (int i = 0; i < super.xpoints.length; i++) {
 			super.xpoints[i] += this.getXVelocity();
 		}
-
 		for (int i = 0; i < super.ypoints.length; i++) {
 			super.ypoints[i] += this.getYVelocity();
 		}
@@ -73,7 +60,6 @@ public class Asteroid extends SpaceObject {
 		for (int i = 0; i < tempXPosition.length; i++) {
 			tempXPosition[i] += randomInitialXPosition;
 		}
-
 		return tempXPosition;
 	}
 
@@ -92,5 +78,4 @@ public class Asteroid extends SpaceObject {
 	public static void setSpeed(double theSpeed) {
 		speed = theSpeed;
 	}
-
 }

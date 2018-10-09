@@ -1,17 +1,17 @@
 package pl.michalskrzypek.ah.objects;
-import java.awt.Polygon;
+
 import java.awt.Rectangle;
 
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 
-public class Bullet extends SpaceObject{
+public class Bullet extends SpaceObject {
 
 	// Get the board width and height
 	private int gBWidth = AsteroidGameBoard.frameWidth;
 	private int gBHeight = AsteroidGameBoard.frameHeight;
 
 	// Center of bullet
-/*	private double centerX = 0, centerY = 0;*/
+	/* private double centerX = 0, centerY = 0; */
 
 	// Will hold the x & y coordinates for the bullet
 	// Everything is based on coordinates from the center
@@ -21,13 +21,12 @@ public class Bullet extends SpaceObject{
 	// Width and height of bullet
 	private int bulletWidth = 6, bulletHeight = 6;
 
-
 	// The angle the bullet moves on the screen
 	private double movingAngle = 0;
 
 	// Determines how quickly the bullet moves on
 	// its assigned path
-	/*private double xVelocity = 5, yVelocity = 5;*/
+	/* private double xVelocity = 5, yVelocity = 5; */
 
 	public Bullet(double shipNoseX, double shipNoseY, double movingAngleOfShip) {
 
@@ -43,14 +42,13 @@ public class Bullet extends SpaceObject{
 		this.setOnScreen(true);
 		this.setWidth(bulletWidth);
 		this.setHeight(bulletHeight);
-		
+
 		this.setXVelocity(this.bulletXMoveAngle(this.movingAngle) * 10);
 		this.setYVelocity(this.bulletYMoveAngle(this.movingAngle) * 10);
 
 	}
 
 	// Set and increase the bullet movement angle
-
 	public void setMovingAngle(double moveAngle) {
 		this.movingAngle = moveAngle;
 	}
@@ -60,37 +58,29 @@ public class Bullet extends SpaceObject{
 	}
 
 	public void changeXPos(double incAmt) {
-		this.setXCenter(this.getXCenter()+incAmt);
+		this.setXCenter(this.getXCenter() + incAmt);
 	}
 
 	public void changeYPos(double incAmt) {
 		this.setYCenter(this.getYCenter() + incAmt);
 	}
-	
-	
+
 	// Artificial rectangle that is used for collision detection
 	public Rectangle getBounds() {
-
-		return new Rectangle((int) this.getXCenter() - 3,
-				(int) this.getYCenter() - 3, getWidth(), getHeight());
+		return new Rectangle((int) this.getXCenter() - 3, (int) this.getYCenter() - 3, getWidth(), getHeight());
 
 	}
 
 	// Calculate the bullet angle of movement
 	public double bulletXMoveAngle(double xMoveAngle) {
-
 		return (double) (Math.cos(xMoveAngle * Math.PI / 180));
-
 	}
 
 	public double bulletYMoveAngle(double yMoveAngle) {
-
 		return (double) (Math.sin(yMoveAngle * Math.PI / 180));
-
 	}
 
 	public void move() {
-
 		// Increase the x origin value based on current velocity
 		this.changeXPos(this.getXVelocity());
 
@@ -103,8 +93,7 @@ public class Bullet extends SpaceObject{
 		this.changeYPos(this.getYVelocity());
 
 		if (this.getYCenter() < 0 || this.getYCenter() > gBHeight) {
-
-		this.setOnScreen(false);
+			this.setOnScreen(false);
 			AsteroidGameBoard.currentBullets--;
 		}
 	}

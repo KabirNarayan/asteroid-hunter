@@ -22,9 +22,7 @@ public abstract class PolygonPowerUp extends Polygon implements PowerUp {
 		polygonXCoordinates = polyXCoordinates;
 		polygonYCoordinates = polyYCoordinates;
 		
-		
 		onScreen = true;
-
 	}
 
 	// Bounds for collision detection

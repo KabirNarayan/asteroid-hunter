@@ -1,6 +1,6 @@
 package pl.michalskrzypek.ah.objects;
 
-import java.awt.*;
+import java.awt.Rectangle;
 
 import pl.michalskrzypek.ah.main.AsteroidGameBoard;
 
@@ -108,15 +108,11 @@ public class SpaceShip extends SpaceObject {
 
 	// Calculate the ship angle of movement
 	public double shipXMoveAngle(double xMoveAngle) {
-
 		return (double) (Math.cos(xMoveAngle * Math.PI / 180));
-
 	}
 
 	public double shipYMoveAngle(double yMoveAngle) {
-
 		return (double) (Math.sin(yMoveAngle * Math.PI / 180));
-
 	}
 
 	// Gets & increases or decreases the rotation angle of the ship
@@ -129,7 +125,6 @@ public class SpaceShip extends SpaceObject {
 	}
 
 	public void increaseRotationAngle() {
-
 		if (getRotationAngle() >= 355) {
 			rotationAngle = 0;
 		} else {
@@ -139,7 +134,6 @@ public class SpaceShip extends SpaceObject {
 
 	// Decrease the rotation angle
 	public void decreaseRotationAngle() {
-
 		if (getRotationAngle() < 0) {
 			rotationAngle = 355;
 		} else {
@@ -149,9 +143,7 @@ public class SpaceShip extends SpaceObject {
 
 	// Bounds of the ship for collision detection
 	public Rectangle getBounds() {
-
 		return new Rectangle((int) getXCenter() - 14, (int) getYCenter() - 15, getWidth(), getHeight());
-
 	}
 
 	public double getShipNoseX() {
@@ -163,7 +155,6 @@ public class SpaceShip extends SpaceObject {
 	}
 
 	public void move() {
-
 		// Increase the x origin value based on current velocity
 		this.increaseXPos(this.getXVelocity());
 		// If the ship goes off the board flip it to the other side of the board
@@ -185,5 +176,4 @@ public class SpaceShip extends SpaceObject {
 		}
 
 	}
-
 }

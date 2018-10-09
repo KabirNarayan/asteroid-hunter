@@ -18,7 +18,6 @@ public abstract class SpaceObject extends Polygon {
 
 	public SpaceObject(int[] polyXArray, int[] polyYArray, int numbOfCorners) {
 		super(polyXArray, polyYArray, numbOfCorners);
-
 	}
 
 	public abstract Rectangle getBounds();
@@ -96,5 +95,4 @@ public abstract class SpaceObject extends Polygon {
 	public void decreaseYVelocity(double incAmt) {
 		this.yVelocity -= incAmt;
 	}
-
 }
