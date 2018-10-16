@@ -33,7 +33,7 @@ public class InitialScreen extends JFrame {
 	private static String level = "Easy";
 	private JButton startGameButton, exitGameButton, instructionButton, levelButton;
 	private Image background;
-
+	
 	public static void main(String[] args) {
 		InitialScreen is = new InitialScreen();
 		is.setVisible(true);
@@ -48,7 +48,6 @@ public class InitialScreen extends JFrame {
 		} catch (IOException | LineUnavailableException e1) {
 			e1.printStackTrace();
 		}
-
 		setSize(315, 428);
 		setResizable(false);
 		setLocation(300, 100);
@@ -56,13 +55,13 @@ public class InitialScreen extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setContentPane(new Background());
 		setLocationRelativeTo(null);
-		
+
 		add(getStartGameButton());
 		add(getInstructionButton());
 		add(getLevelButton());
 		add(getExitGameButton());
 	}
-	
+
 	private JButton getStartGameButton() {
 		if (startGameButton == null) {
 			startGameButton = new JButton("Start game");
@@ -117,7 +116,7 @@ public class InitialScreen extends JFrame {
 		}
 		return levelButton;
 	}
-	
+
 	private JButton getExitGameButton() {
 		if (exitGameButton == null) {
 			exitGameButton = new JButton("Exit game");

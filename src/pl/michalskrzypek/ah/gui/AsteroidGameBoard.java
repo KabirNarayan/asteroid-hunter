@@ -65,37 +65,37 @@ public class AsteroidGameBoard extends JFrame {
 	public static ArrayList<SlowTimer> slowTimers = new ArrayList<SlowTimer>();
 	public static boolean keyHeld = false;
 	public static char keyChar;
+	public static boolean gameOver;
+	public static boolean paused;
+	public static int pausedTimes = 0;
+	public static int asteroidsLeft = 8;
+	public static float timePassed = 0;
+	public static String livesLeft;
+	public static String timePassedString;
 
+	private static String playerName;
+	private static ArrayList<Double> scoreTimes;
+	private static ArrayList<String> scoresTotal;
+	private static boolean closed;
+	private static boolean generate;
+	private static Point collisionPoint;
+	private static float startTime;
 	private static ScheduledThreadPoolExecutor executor, executorPU;
 	private static File highScores;
 	private static FileWriter fw;
 	private static BufferedWriter bw;
 	private static FileReader fr;
 	private static BufferedReader br;
-	private Clip clip;
+	private static Clip clip;
 	private Image spaceImage, explosionImage, asteroidImage, spaceShipImage, earthImage;
-
-	public static int pausedTimes = 0;
-	public static int asteroidsLeft = 8;
-	public static float timePassed = 0;
-	public static String livesLeft;
-	public static String timePassedString;
-	private static String playerName;
-	private static ArrayList<Double> scoreTimes;
-	private static ArrayList<String> scoresTotal;
-	public static boolean gameOver;
-	public static boolean paused;
-	private static boolean closed;
-	private static boolean generate;
-	private static Point collisionPoint;
-	private static float startTime;
-
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem playAgainItem, goToMenuItem, exitItem;
 	private ComponentCreator comp;
 
 	public AsteroidGameBoard(String pName) {
+		playBackgroundMusic();
+
 		playerName = pName;
 		generate = true;
 		paused = false;
@@ -103,13 +103,6 @@ public class AsteroidGameBoard extends JFrame {
 		gameOver = false;
 		timePassed = 0;
 		startTime = 0;
-
-		try {
-			clip = AudioSystem.getClip();
-			SoundUtil.playBackgroundMusic(clip, "./sounds/background.wav");
-		} catch (LineUnavailableException e1) {
-			e1.printStackTrace();
-		}
 
 		// initializing executor for generating power ups
 		executorPU = new ScheduledThreadPoolExecutor(5);
@@ -134,6 +127,15 @@ public class AsteroidGameBoard extends JFrame {
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
+	
+	private static void playBackgroundMusic() {
+		try {
+			clip = AudioSystem.getClip();
+			SoundUtil.playBackgroundMusic(clip, "./sounds/background.wav");
+		} catch (LineUnavailableException e1) {
+			e1.printStackTrace();
+		}
+	}
 
 	private void initializeMenu() {
 		menuBar = new JMenuBar();
@@ -142,7 +144,8 @@ public class AsteroidGameBoard extends JFrame {
 
 		playAgainItem = new JMenuItem(new AbstractAction("Play Again") {
 			public void actionPerformed(ActionEvent e) {
-				SoundUtil.stopBackgroundMusic(clip);
+//				SoundUtil.stopBackgroundMusic();
+				playBackgroundMusic();
 				playAgain();
 			}
 		});
@@ -191,7 +194,7 @@ public class AsteroidGameBoard extends JFrame {
 				if (option != -1) {
 					InitialScreen.setLevel(option);
 					playerName = n;
- 					initiateHighScoresFiles();
+					initiateHighScoresFiles();
 					initiateInitialValues();
 				} else {
 					paused = false;
@@ -405,7 +408,7 @@ public class AsteroidGameBoard extends JFrame {
 		Collections.sort(scoreTimes);
 		for (double score : scoreTimes) {
 			int index = scoreTimes.indexOf(score);
-			scoresTotal.add(index+1 + ". " + map.get(score) + " " + String.format("%.2fs", score / 1000));
+			scoresTotal.add(index + 1 + ". " + map.get(score) + " " + String.format("%.2fs", score / 1000));
 		}
 	}// END of getHighScores method
 
@@ -530,7 +533,10 @@ public class AsteroidGameBoard extends JFrame {
 					drawBullets();
 
 				} else if (ship.getLives() <= 0) {
-					SoundUtil.stopBackgroundMusic(clip);
+					Thread th = new Thread(() -> {
+						SoundUtil.stopBackgroundMusic(clip);
+					});
+					th.start();
 
 					gameOverLabel.setText("Game over!");
 
@@ -542,7 +548,10 @@ public class AsteroidGameBoard extends JFrame {
 					gameOver = true;
 
 				} else if (!ifAnyAsteroidsLeft(asteroids)) {
-					SoundUtil.stopBackgroundMusic(clip);
+					Thread th = new Thread(() -> {
+						SoundUtil.stopBackgroundMusic(clip);
+					});
+					th.start();
 
 					if (!closed) {
 						try {
@@ -575,7 +584,7 @@ public class AsteroidGameBoard extends JFrame {
 			}
 			// if game is paused
 			else {
-				clip.stop();
+				SoundUtil.stopBackgroundMusic(clip);
 				g2.setPaint(Color.YELLOW);
 				g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 46));
 				int stringWidth = g2.getFontMetrics().stringWidth("Paused");

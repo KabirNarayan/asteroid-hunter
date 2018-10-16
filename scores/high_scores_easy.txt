@@ -9,3 +9,5 @@ osiemTime:14625.0
 dziewiecTime:4560.0
 tenTime:10920.0
 aaaaTime:28575.0
+aaaaTime:10320.0
+hahaTime:8205.0
