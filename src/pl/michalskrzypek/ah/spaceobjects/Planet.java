@@ -10,14 +10,11 @@ import pl.michalskrzypek.ah.gui.AsteroidGameBoard;
 public class Planet extends Ellipse2D {
 	
 	private String planetName;
+	private Color planetColor = null;
 	private double planetRadius = 100;
-
+	private double gravityForce;
 	private int xCenter = AsteroidGameBoard.FRAME_WIDTH/2;
 	private int yCenter = AsteroidGameBoard.FRAME_HEIGHT/2;
-	
-	private Color planetColor = null;
-	
-	private double gravityForce;
 	
 	public Planet(String planetName, double planetRadius, Color planetColor, double gravityForce) {
 		super();

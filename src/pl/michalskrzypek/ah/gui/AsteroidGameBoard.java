@@ -37,6 +37,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import pl.michalskrzypek.ah.gui.events.KeyManager;
 import pl.michalskrzypek.ah.logic.Collision;
 import pl.michalskrzypek.ah.spaceobjects.Asteroid;
 import pl.michalskrzypek.ah.spaceobjects.Bullet;
@@ -52,30 +53,19 @@ import pl.michalskrzypek.ah.utils.SoundUtil;
 public class AsteroidGameBoard extends JFrame {
 
 	public static final String GAME_TITLE = "Asteroid Hunter";
-
 	public static final int FRAME_WIDTH = 1000;
 	public static final int FRAME_HEIGHT = 600;
-	
-	private JMenuBar menuBar;
-	private JMenu fileMenu;
-	private JMenuItem playAgainItem, goToMenuItem, exitItem;
-	private ComponentCreator comp;
-	
+
 	public static SpaceShip ship;
 	public static Planet thePlanet = null;
 	public static ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
 	public static ArrayList<Bullet> bulletList = new ArrayList<Bullet>();
 	public static ArrayList<Freezer> freezers = new ArrayList<Freezer>();
 	public static ArrayList<SlowTimer> slowTimers = new ArrayList<SlowTimer>();
-	
 	public static boolean keyHeld = false;
-	public static char getKeyChar;
-	
-	public static final int MAX_BULLETS = 5;
-	public static int currentBullets = 0;
-	
-	public static ScheduledThreadPoolExecutor executor, executorPU;
+	public static char keyChar;
 
+	private static ScheduledThreadPoolExecutor executor, executorPU;
 	private static File highScores;
 	private static FileWriter fw;
 	private static BufferedWriter bw;
@@ -101,6 +91,11 @@ public class AsteroidGameBoard extends JFrame {
 	private static Point collisionPoint;
 	private static float startTime;
 
+	private JMenuBar menuBar;
+	private JMenu fileMenu;
+	private JMenuItem playAgainItem, goToMenuItem, exitItem;
+	private ComponentCreator comp;
+
 	public AsteroidGameBoard(String pName) {
 		playerName = pName;
 		generate = true;
@@ -111,7 +106,7 @@ public class AsteroidGameBoard extends JFrame {
 		gameOver = false;
 		timePassed = 0;
 		startTime = 0;
-		
+
 		try {
 			clip = AudioSystem.getClip();
 			SoundUtil.playBackgroundMusic(clip, "./sounds/background.wav");
@@ -126,19 +121,20 @@ public class AsteroidGameBoard extends JFrame {
 
 		comp = new ComponentCreator();
 		add(comp, BorderLayout.CENTER);
-		
+
 		// initializing executor for repeating paint method in ComponentCreator class
 		executor = new ScheduledThreadPoolExecutor(5);
 		executor.scheduleAtFixedRate(() -> {
-				comp.repaint();
+			comp.repaint();
 		}, 0L, 15L, TimeUnit.MILLISECONDS);
-		
+
 		initializeMenu();
 		initiateHighScoresFiles();
-		
+
 		setTitle(GAME_TITLE);
 		setSize(FRAME_WIDTH + 15, FRAME_HEIGHT + 60);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 
@@ -175,7 +171,7 @@ public class AsteroidGameBoard extends JFrame {
 		fileMenu.add(exitItem);
 		this.setJMenuBar(menuBar);
 	}
-	
+
 	private static void initiateHighScoresFiles() {
 		File highScoresEasy = new File("./scores/high_scores_easy.txt");
 		File highScoresMedium = new File("./scores/high_scores_medium.txt");
@@ -196,7 +192,6 @@ public class AsteroidGameBoard extends JFrame {
 			fw = new FileWriter(highScores, true);
 			bw = new BufferedWriter(fw);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -212,9 +207,8 @@ public class AsteroidGameBoard extends JFrame {
 
 		if (asteroidsOnScreen == 0) {
 			return false;
-		} else {
-			return true;
 		}
+		return true;
 	}
 
 	public void playAgain() {
@@ -229,27 +223,12 @@ public class AsteroidGameBoard extends JFrame {
 				int option = JOptionPane.showOptionDialog(AsteroidGameBoard.this, new String("Select level:"), "",
 						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, InitialScreen.GAME_LEVELS,
 						InitialScreen.GAME_LEVELS[0]);
-				InitialScreen.setLevel(option);
-
 				if (option != -1) {
+					InitialScreen.setLevel(option);
 					playerName = name;
-					initiateHighScoresFiles();
-					try {
-						clip = AudioSystem.getClip();
-					} catch (LineUnavailableException e) {
-						e.printStackTrace();
-					}
 					SoundUtil.playBackgroundMusic(clip, "./sounds/background.wav");
-					freezers.clear();
-					slowTimers.clear();
-					generateAsteroids();
-					paused = false;
-					timePassed = 0;
-					generate = true;
-					gameOver = false;
-					closed = false;
-					collisionPoint = null;
-					ship = new SpaceShip();
+					initiateHighScoresFiles();
+					initiateInitialValues();
 				} else {
 					paused = false;
 				}
@@ -261,11 +240,22 @@ public class AsteroidGameBoard extends JFrame {
 		} else {
 			paused = false;
 		}
+	}
 
+	private void initiateInitialValues() {
+		freezers.clear();
+		slowTimers.clear();
+		generateAsteroids();
+		paused = false;
+		timePassed = 0;
+		generate = true;
+		gameOver = false;
+		closed = false;
+		collisionPoint = null;
+		ship = new SpaceShip();
 	}
 
 	public static void generateAsteroids() {
-
 		asteroids.clear();
 		int numb = 6;
 
@@ -294,7 +284,6 @@ public class AsteroidGameBoard extends JFrame {
 					Asteroid.getInitialYPosition(randomYInitialPos), 11);
 
 			asteroids.add(theasteroid);
-
 		}
 	}// END of generateAsteroids method
 
@@ -328,30 +317,29 @@ public class AsteroidGameBoard extends JFrame {
 	// Generates a freezer power up every 10 seconds
 	public static void generateFreezers() {
 		executorPU.scheduleAtFixedRate(() -> {
-				int counter = 0;
-				
-				// checking if there is any freezer on the screen. If not it generates one
-				// (every 14 seconds)
-				for (Freezer f : AsteroidGameBoard.freezers) {
-					if (f.getOnScreen()) {
-						counter++;
-					}
+			int counter = 0;
+
+			// checking if there is any freezer on the screen. If not it generates one
+			// (every 14 seconds)
+			for (Freezer f : AsteroidGameBoard.freezers) {
+				if (f.getOnScreen()) {
+					counter++;
+				}
+			}
+
+			if (counter == 0 && generate) {
+				int randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
+
+				while ((randomXInitialPos >= FRAME_WIDTH / 2 - 50 && randomXInitialPos <= FRAME_WIDTH / 2 + 50)) {
+					randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
 				}
 
-				if (counter == 0 && generate) {
-					int randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-
-					while ((randomXInitialPos >= FRAME_WIDTH / 2 - 50 && randomXInitialPos <= FRAME_WIDTH / 2 + 50)) {
-						randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-					}
-
-					Freezer fr = new Freezer(Freezer.getInitialXPosition(randomXInitialPos));
-					freezers.add(fr);
-				}
-				counter = 0;
+				Freezer fr = new Freezer(Freezer.getInitialXPosition(randomXInitialPos));
+				freezers.add(fr);
+			}
+			counter = 0;
 		}, 7, 14, TimeUnit.SECONDS);
 	}// END of generateFreezers method
-
 
 	/*
 	 * Adds gravity force to a ship
@@ -407,7 +395,8 @@ public class AsteroidGameBoard extends JFrame {
 			}
 		} else {
 			if (angleDegrees <= 270) {
-				if (theShip.getXVelocity() <= SpaceShip.MAX_VELOCITY && theShip.getYVelocity() <= SpaceShip.MAX_VELOCITY) {
+				if (theShip.getXVelocity() <= SpaceShip.MAX_VELOCITY
+						&& theShip.getYVelocity() <= SpaceShip.MAX_VELOCITY) {
 					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
 					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * force);
 				}
@@ -470,13 +459,13 @@ public class AsteroidGameBoard extends JFrame {
 
 	// MAIN CODE FOR MAKING A SHIP FLOAT
 	public void shipFly() {
-		if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'd') {
+		if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 'd') {
 			ship.increaseRotationAngle();
 			gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
-		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'a') {
+		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 'a') {
 			ship.decreaseRotationAngle();
 			gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
-		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 'w') {
+		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 'w') {
 			ship.setMovingAngle(ship.getRotationAngle());
 			if (((ship.getRotationAngle() < 90 || ship.getRotationAngle() > 270)
 					&& ship.getXVelocity() <= SpaceShip.MAX_VELOCITY)
@@ -492,7 +481,7 @@ public class AsteroidGameBoard extends JFrame {
 							&& ship.getYVelocity() >= (-1) * SpaceShip.MAX_VELOCITY)) {
 				ship.increaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
 			}
-		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.getKeyChar == 's') {
+		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 's') {
 			ship.setMovingAngle(ship.getRotationAngle());
 			if (((ship.getRotationAngle() < 90 || ship.getRotationAngle() > 270)
 					&& ship.getXVelocity() > (-1) * SpaceShip.MAX_VELOCITY)
@@ -512,9 +501,6 @@ public class AsteroidGameBoard extends JFrame {
 		ship.move();
 	}// END OF THE shipFly method
 
-	/*
-	 * Inner class responsible for displaying game as a JComponent
-	 */
 	class ComponentCreator extends JComponent {
 
 		JLabel gameOverLabel = new JLabel("GAME OVER");

@@ -19,7 +19,7 @@ public class Collision {
 				asteroid.setOnScreen(false);
 				bullet.setOnScreen(false);
 				AsteroidGameBoard.aLeft--;
-				AsteroidGameBoard.currentBullets--;
+				Bullet.numberOfBullets--;
 			}
 		}
 	}

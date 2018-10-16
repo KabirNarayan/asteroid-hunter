@@ -11,17 +11,20 @@ import pl.michalskrzypek.ah.utils.SoundUtil;
 @SuppressWarnings("serial")
 public class Freezer extends PolygonPowerUp {
 
+	public static final int WIDTH = 14;
+	public static final int HEIGHT = 20;
+	private static final int NUMBER_OF_CORNERS = 5;
 	private static int[] freezerXCoordinates = { -7, 7, 7, -7, -7 };
 	private static int[] freezerYCoordinates = { -10, -10, 10, 10, -10 };
-	private static final int NUMBER_OF_CORNERS = 5;
 
-	public Freezer(int[] polyXCoordinates) {
-		super(polyXCoordinates, freezerYCoordinates, NUMBER_OF_CORNERS);
+
+	public Freezer(int[] initialXCoordinates) {
+		super(initialXCoordinates, freezerYCoordinates, NUMBER_OF_CORNERS);
 	}
 
 	@Override
 	public Rectangle getBounds() {
-		return new Rectangle(this.xpoints[0], this.ypoints[0], 14, 20);
+		return new Rectangle(this.xpoints[0], this.ypoints[0], WIDTH, HEIGHT);
 	}
 
 	public void move() {

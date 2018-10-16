@@ -12,20 +12,21 @@ import pl.michalskrzypek.ah.utils.SoundUtil;
 @SuppressWarnings("serial")
 public class SlowTimer extends PolygonPowerUp {
 
+	public static final int WIDTH = 16;
+	public static final int HEIGHT = 16;
 	private static int[] polygonXCoordinates = { -8, 8, 8, -8, -8 };
 	private static int[] polygonYCoordinates = { -8, -8, 8, 8, -8 };
 	private static final int NUMBER_OF_CORNERS = 5;
 
 	private double yVelocity = 2;
 
-	public SlowTimer(int[] polyXCoordinates) {
-		super(polyXCoordinates, polygonYCoordinates, NUMBER_OF_CORNERS);
+	public SlowTimer(int[] initialXCoordinates) {
+		super(initialXCoordinates, polygonYCoordinates, NUMBER_OF_CORNERS);
 	}
 
 	@Override
 	public Rectangle getBounds() {
-		// TODO Auto-generated method stub
-		return new Rectangle(this.xpoints[0], this.ypoints[0], 20, 20);
+		return new Rectangle(this.xpoints[0], this.ypoints[0], WIDTH, HEIGHT);
 	}
 
 	public void move() {

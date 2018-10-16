@@ -1,9 +1,7 @@
 package pl.michalskrzypek.ah.spaceobjects.powerups;
 
-
 import java.awt.Polygon;
 import java.awt.Rectangle;
-
 
 @SuppressWarnings("serial")
 public abstract class PolygonPowerUp extends Polygon implements PowerUp {

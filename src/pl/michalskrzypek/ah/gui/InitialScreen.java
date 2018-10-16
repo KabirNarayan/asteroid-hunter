@@ -17,18 +17,22 @@ import javax.swing.JOptionPane;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
 /*
- * Class responsible for displaying main game screen
+ * Class responsible for displaying menu game screen
  */
 @SuppressWarnings("serial")
 public class InitialScreen extends JFrame {
 
-	private JButton startGameButton, exitGameButton, instructionButton, levelButton;
-	private Image background;
+	public static final String GAME_INFORMATION = "GAME CONTROLS:\nw  -  move forward\ns  -  move backward\n"
+			+ "d  -  rotate ship clockwise\na  -  rotate ship counter-clockwise\nENTER  -  shoot a bullet\n"
+			+ "p - pause the game\n\nINSTRUCTION:\nTry to destroy every asteroid!\n"
+			+ "Press ENTER to strike an asteroid.\nCollect green power-ups to freeze asteroids for 5 seconds!\n"
+			+ "You can collide with an asteroid up to 5 times, \nso be careful!\n\n"
+			+ "Asteroid Hunter® by Michal Skrzypek\nmskrzypek97@gmail.com";
+	public static final String[] GAME_LEVELS = { "Easy", "Medium", "Hard" };
 	private static Clip clip;
 	private static String level = "Easy";
-	
-	public static final String GAME_INFORMATION = "GAME CONTROLS:\nw  -  move forward\ns  -  move backward\nd  -  rotate ship clockwise\na  -  rotate ship counter-clockwise\nENTER  -  shoot a bullet\np - pause the game\n\nINSTRUCTION:\nTry to destroy every asteroid!\nPress ENTER to strike an asteroid.\nCollect green power-ups to freeze asteroids for 5 seconds!\nYou can collide with an asteroid up to 5 times, \nso be careful!\n\nAsteroid Hunter® by Michal Skrzypek\nmskrzypek97@gmail.com";
-	public static final String[] GAME_LEVELS = { "Easy", "Medium", "Hard" };
+	private JButton startGameButton, exitGameButton, instructionButton, levelButton;
+	private Image background;
 
 	public static void main(String[] args) {
 		InitialScreen is = new InitialScreen();
@@ -51,6 +55,7 @@ public class InitialScreen extends JFrame {
 		setLayout(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setContentPane(new Background());
+		setLocationRelativeTo(null);
 		
 		add(getStartGameButton());
 		add(getInstructionButton());

@@ -1,8 +1,9 @@
-package pl.michalskrzypek.ah.gui;
+package pl.michalskrzypek.ah.gui.events;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import pl.michalskrzypek.ah.gui.AsteroidGameBoard;
 import pl.michalskrzypek.ah.spaceobjects.Bullet;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
@@ -19,10 +20,10 @@ public class KeyManager implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if (AsteroidGameBoard.currentBullets < AsteroidGameBoard.MAX_BULLETS) {
+			if (Bullet.numberOfBullets < Bullet.MAX_BULLETS) {
 				AsteroidGameBoard.bulletList.add(new Bullet(AsteroidGameBoard.ship.getShipNoseX(),
 						AsteroidGameBoard.ship.getShipNoseY(), AsteroidGameBoard.ship.getRotationAngle()));
-				AsteroidGameBoard.currentBullets++;
+				Bullet.numberOfBullets++;
 				SoundUtil.playSound("./sounds/laser.aiff");
 			}
 		}
@@ -41,7 +42,7 @@ public class KeyManager implements KeyListener {
 		}
 
 		if (e.getKeyChar() == 'w' || e.getKeyChar() == 'a' || e.getKeyChar() == 's' || e.getKeyChar() == 'd') {
-			AsteroidGameBoard.getKeyChar = e.getKeyChar();
+			AsteroidGameBoard.keyChar = e.getKeyChar();
 			AsteroidGameBoard.keyHeld = true;
 		}
 	}
