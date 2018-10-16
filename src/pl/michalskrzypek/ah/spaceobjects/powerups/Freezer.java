@@ -13,9 +13,11 @@ public class Freezer extends PolygonPowerUp {
 
 	public static final int WIDTH = 14;
 	public static final int HEIGHT = 20;
+	public static boolean freeze;
 	private static final int NUMBER_OF_CORNERS = 5;
 	private static int[] freezerXCoordinates = { -7, 7, 7, -7, -7 };
 	private static int[] freezerYCoordinates = { -10, -10, 10, 10, -10 };
+	
 
 
 	public Freezer(int[] initialXCoordinates) {
@@ -38,11 +40,11 @@ public class Freezer extends PolygonPowerUp {
 					// collision detection with ship
 					if (otherRect.intersects(shipBounds)) {
 						fr.setOnScreen(false);
-						AsteroidGameBoard.freeze = true;
+						freeze = true;
 						SoundUtil.playSound("./sounds/collect.wav");
 						ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 						executor.schedule(() -> {
-								AsteroidGameBoard.freeze = false;
+								freeze = false;
 						}, 5000, TimeUnit.MILLISECONDS);
 					}
 				}

@@ -18,7 +18,7 @@ public class Collision {
 			if (asteroid.getBounds().contains(bullet.getBounds()) && asteroid.getOnScreen()) {
 				asteroid.setOnScreen(false);
 				bullet.setOnScreen(false);
-				AsteroidGameBoard.aLeft--;
+				AsteroidGameBoard.asteroidsLeft--;
 				Bullet.numberOfBullets--;
 			}
 		}

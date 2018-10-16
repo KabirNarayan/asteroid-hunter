@@ -14,6 +14,7 @@ public class SlowTimer extends PolygonPowerUp {
 
 	public static final int WIDTH = 16;
 	public static final int HEIGHT = 16;
+	public static boolean slowTime = false;
 	private static int[] polygonXCoordinates = { -8, 8, 8, -8, -8 };
 	private static int[] polygonYCoordinates = { -8, -8, 8, 8, -8 };
 	private static final int NUMBER_OF_CORNERS = 5;
@@ -40,7 +41,7 @@ public class SlowTimer extends PolygonPowerUp {
 					// collision detection with ship
 					if (otherRect.intersects(shipBounds)) {
 						st.setOnScreen(false);
-						AsteroidGameBoard.slowTime = true;
+						slowTime = true;
 						SoundUtil.playSound("./sounds/collect.wav");
 
 						for (Asteroid as : AsteroidGameBoard.asteroids) {
@@ -50,7 +51,7 @@ public class SlowTimer extends PolygonPowerUp {
 
 						ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 						executor.schedule(() -> {
-							AsteroidGameBoard.slowTime = false;
+							slowTime = false;
 							for (Asteroid as : AsteroidGameBoard.asteroids) {
 								as.setXVelocity(as.getXVelocity() * 2);
 								as.setYVelocity(as.getYVelocity() * 2);

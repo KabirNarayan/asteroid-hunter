@@ -12,8 +12,9 @@ public class Asteroid extends SpaceObject {
 	private static final int ASTEROID_HEIGHT = 40;
 	private static int[] polygonXCoordinates = { -20, -10, -1, 0, 10, 8, 20, 4, -2, -10, -20 };
 	private static int[] polygonYCoordinates = { -5, -13, -10, -20, -7, -3, 5, 20, 8, 12, -5 };
+	private static int numberOfCorners = 11;
 
-	public Asteroid(int[] polygonXCoordinates, int[] polygonYCoordinates, int numberOfCorners) {
+	public Asteroid(int[] polygonXCoordinates, int[] polygonYCoordinates) {
 		super(polygonXCoordinates, polygonYCoordinates, numberOfCorners);
 
 		this.setXVelocity(Math.random() * speed + 1);

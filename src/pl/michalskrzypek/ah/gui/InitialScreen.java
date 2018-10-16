@@ -62,7 +62,7 @@ public class InitialScreen extends JFrame {
 		add(getLevelButton());
 		add(getExitGameButton());
 	}
-
+	
 	private JButton getStartGameButton() {
 		if (startGameButton == null) {
 			startGameButton = new JButton("Start game");

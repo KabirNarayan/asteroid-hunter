@@ -1,3 +1,11 @@
-5656Time:9015.0
-dfghTime:36405.0
-mikeTime:13935.0
+razTime:9015.0
+dwaTime:36405.0
+trzyTime:13935.0
+czteryTime:21240.0
+piecTime:20820.0
+szescTime:11070.0
+siedemTime:17175.0
+osiemTime:14625.0
+dziewiecTime:4560.0
+tenTime:10920.0
+aaaaTime:28575.0

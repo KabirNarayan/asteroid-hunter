@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -75,15 +76,13 @@ public class AsteroidGameBoard extends JFrame {
 	private Image spaceImage, explosionImage, asteroidImage, spaceShipImage, earthImage;
 
 	public static int pausedTimes = 0;
-	public static int aLeft = 8;
+	public static int asteroidsLeft = 8;
 	public static float timePassed = 0;
 	public static String livesLeft;
 	public static String timePassedString;
 	private static String playerName;
 	private static ArrayList<Double> scoreTimes;
 	private static ArrayList<String> scoresTotal;
-	public static boolean freeze;
-	public static boolean slowTime;
 	public static boolean gameOver;
 	public static boolean paused;
 	private static boolean closed;
@@ -99,8 +98,6 @@ public class AsteroidGameBoard extends JFrame {
 	public AsteroidGameBoard(String pName) {
 		playerName = pName;
 		generate = true;
-		freeze = false;
-		slowTime = false;
 		paused = false;
 		closed = false;
 		gameOver = false;
@@ -157,7 +154,8 @@ public class AsteroidGameBoard extends JFrame {
 				SoundUtil.stopBackgroundMusic(clip);
 				executor.shutdown();
 				executorPU.shutdown();
-				new InitialScreen();
+				InitialScreen initScreen = new InitialScreen();
+				initScreen.setVisible(true);
 			}
 		});
 		fileMenu.add(goToMenuItem);
@@ -172,11 +170,46 @@ public class AsteroidGameBoard extends JFrame {
 		this.setJMenuBar(menuBar);
 	}
 
+	public static boolean ifAnyAsteroidsLeft(ArrayList<Asteroid> asteroidList) {
+		long asteroidsOnScreen = asteroidList.stream().filter(a -> a.getOnScreen()).count();
+		if (asteroidsOnScreen == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	public void playAgain() {
+		paused = true;
+		Optional<String> name = Optional.ofNullable(JOptionPane.showInputDialog(this, "Please enter your name",
+				"Enter player name", JOptionPane.QUESTION_MESSAGE));
+
+		if (name.isPresent()) {
+			name.map(n -> n.trim()).filter(n -> n.length() >= 3).ifPresentOrElse(n -> {
+				int option = JOptionPane.showOptionDialog(AsteroidGameBoard.this, new String("Select level:"), "",
+						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, InitialScreen.GAME_LEVELS,
+						InitialScreen.GAME_LEVELS[0]);
+				if (option != -1) {
+					InitialScreen.setLevel(option);
+					playerName = n;
+ 					initiateHighScoresFiles();
+					initiateInitialValues();
+				} else {
+					paused = false;
+				}
+			}, () -> {
+				JOptionPane.showMessageDialog(AsteroidGameBoard.this, "Name is too short! (min 3 letters)", null,
+						JOptionPane.ERROR_MESSAGE);
+				paused = false;
+			});
+		} else {
+			paused = false;
+		}
+	}
+
 	private static void initiateHighScoresFiles() {
 		File highScoresEasy = new File("./scores/high_scores_easy.txt");
 		File highScoresMedium = new File("./scores/high_scores_medium.txt");
 		File highScoresHard = new File("./scores/high_scores_hard.txt");
-		// readers and writers needed to save and read the high scores
 
 		if (InitialScreen.getLevel().equals("Easy")) {
 			highScores = highScoresEasy;
@@ -193,52 +226,6 @@ public class AsteroidGameBoard extends JFrame {
 			bw = new BufferedWriter(fw);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-		}
-	}
-
-	public static boolean ifAnyAsteroidsLeft(ArrayList<Asteroid> asteroidList) {
-		int asteroidsOnScreen = 0;
-
-		for (Asteroid asteroid : asteroidList) {
-			if (asteroid.getOnScreen()) {
-				asteroidsOnScreen++;
-			}
-		}
-
-		if (asteroidsOnScreen == 0) {
-			return false;
-		}
-		return true;
-	}
-
-	public void playAgain() {
-		paused = true;
-		String name = JOptionPane.showInputDialog(AsteroidGameBoard.this, "Please enter your name", "Enter player name",
-				JOptionPane.QUESTION_MESSAGE);
-
-		if (name != null) {
-			name = name.trim();
-			if (name.length() >= 3) {
-
-				int option = JOptionPane.showOptionDialog(AsteroidGameBoard.this, new String("Select level:"), "",
-						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, InitialScreen.GAME_LEVELS,
-						InitialScreen.GAME_LEVELS[0]);
-				if (option != -1) {
-					InitialScreen.setLevel(option);
-					playerName = name;
-					SoundUtil.playBackgroundMusic(clip, "./sounds/background.wav");
-					initiateHighScoresFiles();
-					initiateInitialValues();
-				} else {
-					paused = false;
-				}
-			} else {
-				JOptionPane.showMessageDialog(AsteroidGameBoard.this, "Name is too short! (min 3 letters)", null,
-						JOptionPane.ERROR_MESSAGE);
-				paused = false;
-			}
-		} else {
-			paused = false;
 		}
 	}
 
@@ -281,7 +268,7 @@ public class AsteroidGameBoard extends JFrame {
 			}
 
 			Asteroid theasteroid = new Asteroid(Asteroid.getInitialXPosition(randomXInitialPos),
-					Asteroid.getInitialYPosition(randomYInitialPos), 11);
+					Asteroid.getInitialYPosition(randomYInitialPos));
 
 			asteroids.add(theasteroid);
 		}
@@ -290,15 +277,7 @@ public class AsteroidGameBoard extends JFrame {
 	// Generates a freezer power up every 7 seconds
 	public static void generateSlowTimers() {
 		executorPU.scheduleAtFixedRate(() -> {
-			int counter = 0;
-
-			// checking if there is any slow timer on the screen. If not it generates one
-			// (every 10 seconds)
-			for (SlowTimer s : AsteroidGameBoard.slowTimers) {
-				if (s.getOnScreen()) {
-					counter++;
-				}
-			}
+			long counter = slowTimers.stream().filter(s -> s.getOnScreen()).count();
 
 			if (counter == 0 && generate) {
 				int randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
@@ -317,23 +296,13 @@ public class AsteroidGameBoard extends JFrame {
 	// Generates a freezer power up every 10 seconds
 	public static void generateFreezers() {
 		executorPU.scheduleAtFixedRate(() -> {
-			int counter = 0;
-
-			// checking if there is any freezer on the screen. If not it generates one
-			// (every 14 seconds)
-			for (Freezer f : AsteroidGameBoard.freezers) {
-				if (f.getOnScreen()) {
-					counter++;
-				}
-			}
-
+			long counter = freezers.stream().filter(f -> f.getOnScreen()).count();
 			if (counter == 0 && generate) {
 				int randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
 
 				while ((randomXInitialPos >= FRAME_WIDTH / 2 - 50 && randomXInitialPos <= FRAME_WIDTH / 2 + 50)) {
 					randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
 				}
-
 				Freezer fr = new Freezer(Freezer.getInitialXPosition(randomXInitialPos));
 				freezers.add(fr);
 			}
@@ -416,44 +385,27 @@ public class AsteroidGameBoard extends JFrame {
 
 	}// END of gravityForce method
 
-	public static void getHighScores() {
-		try {
-			fr = new FileReader(highScores);
-			br = new BufferedReader(fr);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
+	public static void getHighScores() throws NumberFormatException, IOException {
+		fr = new FileReader(highScores);
+		br = new BufferedReader(fr);
 		scoreTimes = new ArrayList<Double>();
 		scoresTotal = new ArrayList<String>();
 		HashMap<Double, String> map = new HashMap<Double, String>();
-
 		String line = null;
 		String[] playerScore = new String[2]; // 0 for name, 1 for score
 
-		try {
-			line = br.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		while (line != null) {
+		while ((line = br.readLine()) != null) {
 			playerScore = line.split("Time:");
-			scoreTimes.add(Double.parseDouble(playerScore[1]));
-			map.put(Double.parseDouble(playerScore[1]), playerScore[0]);
-			try {
-				line = br.readLine();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			String pName = playerScore[0];
+			double pScore = Double.parseDouble(playerScore[1]);
+			scoreTimes.add(pScore);
+			map.put(pScore, pName);
 		}
+
 		Collections.sort(scoreTimes);
-		int i = 1;
-		for (Double score : scoreTimes) {
-			if (i <= 10) {
-				scoresTotal.add(i + ". " + map.get(score) + " " + String.format("%.2fs", score / 1000));
-				i++;
-			}
+		for (double score : scoreTimes) {
+			int index = scoreTimes.indexOf(score);
+			scoresTotal.add(index+1 + ". " + map.get(score) + " " + String.format("%.2fs", score / 1000));
 		}
 	}// END of getHighScores method
 
@@ -503,9 +455,13 @@ public class AsteroidGameBoard extends JFrame {
 
 	class ComponentCreator extends JComponent {
 
-		JLabel gameOverLabel = new JLabel("GAME OVER");
+		private Graphics2D g2;
+		private AffineTransform identity;
+		private JLabel gameOverLabel;
 
 		public ComponentCreator() {
+			gameOverLabel = new JLabel("GAME OVER");
+			identity = new AffineTransform();
 
 			ship = new SpaceShip();
 			ship.setYCenter(ship.getYCenter() - 70);
@@ -514,7 +470,6 @@ public class AsteroidGameBoard extends JFrame {
 			generateFreezers();
 			generateSlowTimers();
 
-			// reading background image
 			try {
 				spaceImage = ImageIO.read(new File("./images/space.jpeg"));
 				explosionImage = ImageIO.read(new File("./images/explosion.gif"));
@@ -526,7 +481,7 @@ public class AsteroidGameBoard extends JFrame {
 			}
 		}
 
-		/*
+		/**
 		 * Overrided method from JComponent class that is refreshed all game long to
 		 * presents current game's stage (non-Javadoc)
 		 * 
@@ -535,28 +490,15 @@ public class AsteroidGameBoard extends JFrame {
 		 * @param g Graphics object essential to display graphical content
 		 */
 		public void paintComponent(Graphics g) {
-			Graphics2D g2 = (Graphics2D) g;
-			AffineTransform identity = new AffineTransform();
+			g2 = (Graphics2D) g;
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			// draw the background
 			g2.drawImage(spaceImage, 0, 0, FRAME_WIDTH, FRAME_HEIGHT, this);
 
-			// Informing a player about remaining lives
-			g2.setPaint(Color.GRAY);
-			g2.drawRect(FRAME_WIDTH - 172, 20, 152, 22);
-			g2.setPaint(Color.RED);
-			g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
-			g2.drawString("HP", FRAME_WIDTH - 200, 37);
-			Rectangle lifeRect = new Rectangle(FRAME_WIDTH - 171, 21, 30 * ship.getLives(), 20);
-			g2.draw(lifeRect);
-			g2.fill(lifeRect);
+			drawRemainingLives();
+			drawAsteroidsLeft();
 
-			// Informing a player about asteroid left
-			g2.setPaint(Color.GRAY);
-			g2.drawString("Asteroids left: " + Integer.toString(aLeft), 30, 37);
-
-			// checking if a game is paused
 			if (!paused) {
 				if (!gameOver && ship.getLives() > 0 && ifAnyAsteroidsLeft(asteroids)) {
 					timePassed += 15;
@@ -564,103 +506,28 @@ public class AsteroidGameBoard extends JFrame {
 					g2.drawImage(earthImage, (int) thePlanet.getX(), (int) thePlanet.getY(), (int) thePlanet.getWidth(),
 							(int) thePlanet.getHeight(), null);
 
-					aLeft = 0;
+					asteroidsLeft = 0;
 
-					for (Asteroid asteroid : asteroids) {
-						if (asteroid.getOnScreen()) {
-							if (!freeze) {
+					drawAsteroids();
+					drawExplossion();
 
-								// don't generate new powerups while using one
-								generate = true;
-
-								Point pt = Collision.AsteroidShipDetection(asteroid, ship, asteroids);
-								if (pt != null) {
-									collisionPoint = pt;
-									startTime = timePassed;
-								}
-								asteroid.move();
-							} else {
-								// don't generate new powerups while using one
-								generate = false;
-							}
-							g2.setPaint(Color.LIGHT_GRAY);
-							g2.drawImage(asteroidImage, asteroid.getBounds().x, asteroid.getBounds().y,
-									asteroid.getWidth(), asteroid.getHeight(), this);
-							aLeft++;
-						}
-					}
-
-					if (collisionPoint != null && timePassed - startTime < 1000) {
-						float time = 1000 - (timePassed - startTime);
-						float opacity = time / (float) 1000;
-						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-						g2.drawImage(explosionImage, collisionPoint.x, collisionPoint.y, 50, 50, this);
-					}
-
-					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-					for (Freezer fr : AsteroidGameBoard.freezers) {
-						if (fr.getOnScreen()) {
-							fr.move();
-							g2.setPaint(Color.GREEN);
-							g2.draw(fr);
-							g2.fill(fr);
-						}
-					}
-
-					for (SlowTimer st : AsteroidGameBoard.slowTimers) {
-						if (st.getOnScreen()) {
-							st.move();
-							g2.setPaint(Color.BLUE);
-							g2.draw(st);
-							g2.fill(st);
-						}
-					}
-
-					// Informing a player about time that have passed since the beginning
-					g2.setPaint(Color.GRAY);
-					timePassedString = String.format("%.2fs", timePassed / 1000);
-					g2.drawString(timePassedString, FRAME_WIDTH - 100, FRAME_HEIGHT - 30);
+					drawFreezers();
+					drawSlowTimers();
+					drawTimePassed();
 
 					shipFly();
+					drawSpeedOfShip();
 
-					// Informing player about the speed of a ship
-					g2.setPaint(Color.GRAY);
-					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
-					g2.drawString("Speed:", 20, FRAME_HEIGHT - 20);
-					g2.drawRect(95, FRAME_HEIGHT - 37, 162, 22);
-					g2.setPaint(Color.CYAN);
-					Rectangle speedRect = new Rectangle(96, FRAME_HEIGHT - 36,
-							(int) Math.max(Math.abs((int) ship.getXVelocity()), Math.abs((int) ship.getYVelocity()))
-									* 40,
-							20);
-					g2.draw(speedRect);
-					g2.fill(speedRect);
-
-					// making moving smooth
+					// making movement smooth
 					g2.setTransform(identity);
-
 					// drawing a ship in different places
 					g2.translate(ship.getXCenter(), ship.getYCenter());
-
 					// Rotates the ship
 					g2.rotate(Math.toRadians(ship.getRotationAngle()));
 					g2.drawImage(spaceShipImage, ship.xpoints[0], ship.ypoints[0], ship.getWidth(), ship.getHeight(),
 							this);
-					// Drawing bullets
-					g2.setPaint(Color.RED);
-					for (Bullet bullet : AsteroidGameBoard.bulletList) {
 
-						if (bullet.getOnScreen()) {
-							bullet.move();
-							g2.setTransform(identity);
-							g2.translate(bullet.getXCenter(), bullet.getYCenter());
-							g2.draw(bullet);
-							g2.setPaint(new Color(255, 252, 0));
-							g2.fill(bullet);
-
-							Collision.BulletDetection(bullet, asteroids);
-						}
-					}
+					drawBullets();
 
 				} else if (ship.getLives() <= 0) {
 					SoundUtil.stopBackgroundMusic(clip);
@@ -706,7 +573,6 @@ public class AsteroidGameBoard extends JFrame {
 					gameOver = true;
 				}
 			}
-
 			// if game is paused
 			else {
 				clip.stop();
@@ -716,6 +582,113 @@ public class AsteroidGameBoard extends JFrame {
 				g2.drawString("Paused", (int) ((FRAME_WIDTH / 2) - (stringWidth / 2)), (int) (FRAME_HEIGHT / 2));
 			}
 		}
-	}
 
+		private void drawRemainingLives() {
+			g2.setPaint(Color.GRAY);
+			g2.drawRect(FRAME_WIDTH - 172, 20, 152, 22);
+			g2.setPaint(Color.RED);
+			g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
+			g2.drawString("HP", FRAME_WIDTH - 200, 37);
+			Rectangle lifeRect = new Rectangle(FRAME_WIDTH - 171, 21, 30 * ship.getLives(), 20);
+			g2.draw(lifeRect);
+			g2.fill(lifeRect);
+		}
+
+		private void drawAsteroidsLeft() {
+			g2.setPaint(Color.GRAY);
+			g2.drawString("Asteroids left: " + Integer.toString(asteroidsLeft), 30, 37);
+		}
+
+		private void drawAsteroids() {
+			for (Asteroid asteroid : asteroids) {
+				if (asteroid.getOnScreen()) {
+					if (!Freezer.freeze) {
+						// don't generate new powerups while using one
+						generate = true;
+
+						Point pt = Collision.AsteroidShipDetection(asteroid, ship, asteroids);
+						if (pt != null) {
+							collisionPoint = pt;
+							startTime = timePassed;
+						}
+						asteroid.move();
+					} else {
+						// don't generate new powerups while using one
+						generate = false;
+					}
+					g2.setPaint(Color.LIGHT_GRAY);
+					g2.drawImage(asteroidImage, asteroid.getBounds().x, asteroid.getBounds().y, asteroid.getWidth(),
+							asteroid.getHeight(), this);
+					asteroidsLeft++;
+				}
+			}
+		}
+
+		private void drawFreezers() {
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+			for (Freezer fr : AsteroidGameBoard.freezers) {
+				if (fr.getOnScreen()) {
+					fr.move();
+					g2.setPaint(Color.GREEN);
+					g2.draw(fr);
+					g2.fill(fr);
+				}
+			}
+		}
+
+		private void drawSlowTimers() {
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+			for (SlowTimer st : AsteroidGameBoard.slowTimers) {
+				if (st.getOnScreen()) {
+					st.move();
+					g2.setPaint(Color.BLUE);
+					g2.draw(st);
+					g2.fill(st);
+				}
+			}
+		}
+
+		private void drawTimePassed() {
+			g2.setPaint(Color.GRAY);
+			timePassedString = String.format("%.2fs", timePassed / 1000);
+			g2.drawString(timePassedString, FRAME_WIDTH - 100, FRAME_HEIGHT - 30);
+		}
+
+		private void drawSpeedOfShip() {
+			g2.setPaint(Color.GRAY);
+			g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
+			g2.drawString("Speed:", 20, FRAME_HEIGHT - 20);
+			g2.drawRect(95, FRAME_HEIGHT - 37, 162, 22);
+			g2.setPaint(Color.CYAN);
+			Rectangle speedRect = new Rectangle(96, FRAME_HEIGHT - 36,
+					(int) Math.max(Math.abs((int) ship.getXVelocity()), Math.abs((int) ship.getYVelocity())) * 40, 20);
+			g2.draw(speedRect);
+			g2.fill(speedRect);
+		}
+
+		private void drawBullets() {
+			g2.setPaint(Color.RED);
+			for (Bullet bullet : AsteroidGameBoard.bulletList) {
+				if (bullet.getOnScreen()) {
+					bullet.move();
+					g2.setTransform(identity);
+					g2.translate(bullet.getXCenter(), bullet.getYCenter());
+					g2.draw(bullet);
+					g2.setPaint(new Color(255, 252, 0));
+					g2.fill(bullet);
+
+					Collision.BulletDetection(bullet, asteroids);
+				}
+			}
+		}
+
+		private void drawExplossion() {
+			if (collisionPoint != null && timePassed - startTime < 1000) {
+				float time = 1000 - (timePassed - startTime);
+				float opacity = time / (float) 1000;
+				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+				g2.drawImage(explosionImage, collisionPoint.x, collisionPoint.y, 50, 50, this);
+			}
+		}
+	}
 }
