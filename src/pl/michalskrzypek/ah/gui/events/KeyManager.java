@@ -7,6 +7,11 @@ import pl.michalskrzypek.ah.gui.AsteroidGameBoard;
 import pl.michalskrzypek.ah.spaceobjects.Bullet;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
+/**
+ * Class responsible for handling key events during the game.
+ * @author mskrzypek
+ *
+ */
 public class KeyManager implements KeyListener {
 
 	@Override

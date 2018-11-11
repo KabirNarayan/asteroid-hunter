@@ -46,7 +46,7 @@ import pl.michalskrzypek.ah.utils.HighScoreUtil;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
 /*
- * Class responsible for the main game functions and thread managing
+ * Class responsible for displaying current game state.
  */
 public class AsteroidGameBoard extends JFrame {
 

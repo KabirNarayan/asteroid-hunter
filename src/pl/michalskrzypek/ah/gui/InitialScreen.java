@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
 /*
- * Class responsible for displaying menu game screen
+ * Class responsible for displaying menu screen
  */
 @SuppressWarnings("serial")
 public class InitialScreen extends JFrame {

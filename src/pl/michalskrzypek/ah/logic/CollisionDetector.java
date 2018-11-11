@@ -10,6 +10,11 @@ import pl.michalskrzypek.ah.spaceobjects.Bullet;
 import pl.michalskrzypek.ah.spaceobjects.SpaceShip;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
+/**
+ * Class responsible for detecting and managing any kind of collisions during the game.
+ * @author mskrz
+ *
+ */
 public class CollisionDetector {
 
 	// Collision detection for a bullet and an asteroid
