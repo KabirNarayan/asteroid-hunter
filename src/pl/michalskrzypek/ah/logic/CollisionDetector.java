@@ -10,7 +10,7 @@ import pl.michalskrzypek.ah.spaceobjects.Bullet;
 import pl.michalskrzypek.ah.spaceobjects.SpaceShip;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
-public class Collision {
+public class CollisionDetector {
 
 	// Collision detection for a bullet and an asteroid
 	public static void BulletDetection(Bullet bullet, ArrayList<Asteroid> asteroids) {

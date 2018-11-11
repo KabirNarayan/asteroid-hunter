@@ -33,8 +33,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import pl.michalskrzypek.ah.gui.events.KeyManager;
-import pl.michalskrzypek.ah.logic.Collision;
-import pl.michalskrzypek.ah.logic.Gravity;
+import pl.michalskrzypek.ah.logic.CollisionDetector;
+import pl.michalskrzypek.ah.logic.GravityForceController;
 import pl.michalskrzypek.ah.logic.SpaceObjectsGenerator;
 import pl.michalskrzypek.ah.spaceobjects.Asteroid;
 import pl.michalskrzypek.ah.spaceobjects.Bullet;
@@ -276,7 +276,7 @@ public class AsteroidGameBoard extends JFrame {
 					drawSlowTimers();
 					drawTimePassed();
 
-					Gravity.controlShip(ship);
+					GravityForceController.controlShip(ship);
 					drawSpeedOfShip();
 
 					// making movement smooth
@@ -367,7 +367,7 @@ public class AsteroidGameBoard extends JFrame {
 						// don't generate new powerups while using one
 						generate = true;
 
-						Point pt = Collision.AsteroidShipDetection(asteroid, ship, asteroids);
+						Point pt = CollisionDetector.AsteroidShipDetection(asteroid, ship, asteroids);
 						if (pt != null) {
 							collisionPoint = pt;
 							startTime = timePassed;
@@ -438,7 +438,7 @@ public class AsteroidGameBoard extends JFrame {
 					g2.setPaint(new Color(255, 252, 0));
 					g2.fill(bullet);
 
-					Collision.BulletDetection(bullet, asteroids);
+					CollisionDetector.BulletDetection(bullet, asteroids);
 				}
 			}
 		}

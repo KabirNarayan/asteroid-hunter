@@ -4,7 +4,7 @@ import pl.michalskrzypek.ah.gui.AsteroidGameBoard;
 import pl.michalskrzypek.ah.spaceobjects.Planet;
 import pl.michalskrzypek.ah.spaceobjects.SpaceShip;
 
-public class Gravity {
+public class GravityForceController {
 	
 	/*
 	 * Adds gravity force to a ship
