@@ -12,15 +12,9 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.geom.AffineTransform;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -40,12 +34,15 @@ import javax.swing.JOptionPane;
 
 import pl.michalskrzypek.ah.gui.events.KeyManager;
 import pl.michalskrzypek.ah.logic.Collision;
+import pl.michalskrzypek.ah.logic.Gravity;
+import pl.michalskrzypek.ah.logic.SpaceObjectsGenerator;
 import pl.michalskrzypek.ah.spaceobjects.Asteroid;
 import pl.michalskrzypek.ah.spaceobjects.Bullet;
 import pl.michalskrzypek.ah.spaceobjects.Planet;
 import pl.michalskrzypek.ah.spaceobjects.SpaceShip;
 import pl.michalskrzypek.ah.spaceobjects.powerups.Freezer;
 import pl.michalskrzypek.ah.spaceobjects.powerups.SlowTimer;
+import pl.michalskrzypek.ah.utils.HighScoreUtil;
 import pl.michalskrzypek.ah.utils.SoundUtil;
 
 /*
@@ -72,20 +69,14 @@ public class AsteroidGameBoard extends JFrame {
 	public static float timePassed = 0;
 	public static String livesLeft;
 	public static String timePassedString;
+	public static boolean generate;
 
 	private static String playerName;
-	private static ArrayList<Double> scoreTimes;
-	private static ArrayList<String> scoresTotal;
 	private static boolean closed;
-	private static boolean generate;
 	private static Point collisionPoint;
 	private static float startTime;
 	private static ScheduledThreadPoolExecutor executor, executorPU;
-	private static File highScores;
-	private static FileWriter fw;
-	private static BufferedWriter bw;
-	private static FileReader fr;
-	private static BufferedReader br;
+	
 	private static Clip clip;
 	private Image spaceImage, explosionImage, asteroidImage, spaceShipImage, earthImage;
 	private JMenuBar menuBar;
@@ -94,7 +85,7 @@ public class AsteroidGameBoard extends JFrame {
 	private ComponentCreator comp;
 
 	public AsteroidGameBoard(String pName) {
-		playBackgroundMusic();
+		addKeyListener(new KeyManager());
 
 		playerName = pName;
 		generate = true;
@@ -103,31 +94,29 @@ public class AsteroidGameBoard extends JFrame {
 		gameOver = false;
 		timePassed = 0;
 		startTime = 0;
-
 		// initializing executor for generating power ups
 		executorPU = new ScheduledThreadPoolExecutor(5);
 
-		addKeyListener(new KeyManager());
-
 		comp = new ComponentCreator();
 		add(comp, BorderLayout.CENTER);
-
+		initializeMenu();
+		
 		// initializing executor for repeating paint method in ComponentCreator class
 		executor = new ScheduledThreadPoolExecutor(5);
 		executor.scheduleAtFixedRate(() -> {
 			comp.repaint();
 		}, 0L, 15L, TimeUnit.MILLISECONDS);
 
-		initializeMenu();
-		initiateHighScoresFiles();
-
 		setTitle(GAME_TITLE);
 		setSize(FRAME_WIDTH + 15, FRAME_HEIGHT + 60);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setVisible(true);
+		
+		HighScoreUtil.initiateHighScoresFiles();
+		playBackgroundMusic();
 	}
-	
+
 	private static void playBackgroundMusic() {
 		try {
 			clip = AudioSystem.getClip();
@@ -194,8 +183,8 @@ public class AsteroidGameBoard extends JFrame {
 				if (option != -1) {
 					InitialScreen.setLevel(option);
 					playerName = n;
-					initiateHighScoresFiles();
-					initiateInitialValues();
+					HighScoreUtil.initiateHighScoresFiles();
+					resetInitialValues();
 				} else {
 					paused = false;
 				}
@@ -209,33 +198,12 @@ public class AsteroidGameBoard extends JFrame {
 		}
 	}
 
-	private static void initiateHighScoresFiles() {
-		File highScoresEasy = new File("./scores/high_scores_easy.txt");
-		File highScoresMedium = new File("./scores/high_scores_medium.txt");
-		File highScoresHard = new File("./scores/high_scores_hard.txt");
+	
 
-		if (InitialScreen.getLevel().equals("Easy")) {
-			highScores = highScoresEasy;
-		} else if (InitialScreen.getLevel().equals("Medium")) {
-			highScores = highScoresMedium;
-		} else if (InitialScreen.getLevel().equals("Hard")) {
-			highScores = highScoresHard;
-		}
-
-		try {
-			fr = new FileReader(highScores);
-			br = new BufferedReader(fr);
-			fw = new FileWriter(highScores, true);
-			bw = new BufferedWriter(fw);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	private void initiateInitialValues() {
+	private void resetInitialValues() {
 		freezers.clear();
 		slowTimers.clear();
-		generateAsteroids();
+		SpaceObjectsGenerator.generateAsteroids(asteroids);
 		paused = false;
 		timePassed = 0;
 		generate = true;
@@ -245,216 +213,7 @@ public class AsteroidGameBoard extends JFrame {
 		ship = new SpaceShip();
 	}
 
-	public static void generateAsteroids() {
-		asteroids.clear();
-		int numb = 6;
-
-		// setting proper asteroids number (regarding to the chosen level)
-		if (InitialScreen.getLevel().equals("Easy")) {
-			numb = 6;
-			Asteroid.setSpeed(2);
-		} else if (InitialScreen.getLevel().equals("Medium")) {
-			numb = 8;
-			Asteroid.setSpeed(3);
-		} else if (InitialScreen.getLevel().equals("Hard")) {
-			numb = 10;
-			Asteroid.setSpeed(4);
-		}
-		for (int i = 0; i < numb; i++) {
-			int randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-			int randomYInitialPos = (int) (Math.random() * (FRAME_HEIGHT - 40)) + 16;
-
-			while ((randomXInitialPos >= FRAME_WIDTH / 2 - 50 && randomXInitialPos <= FRAME_WIDTH / 2 + 50)
-					&& (randomYInitialPos >= FRAME_HEIGHT / 2 - 50 && randomYInitialPos <= FRAME_HEIGHT / 2 + 50)) {
-				randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-				randomYInitialPos = (int) (Math.random() * (FRAME_HEIGHT - 40)) + 16;
-			}
-
-			Asteroid theasteroid = new Asteroid(Asteroid.getInitialXPosition(randomXInitialPos),
-					Asteroid.getInitialYPosition(randomYInitialPos));
-
-			asteroids.add(theasteroid);
-		}
-	}// END of generateAsteroids method
-
-	// Generates a freezer power up every 7 seconds
-	public static void generateSlowTimers() {
-		executorPU.scheduleAtFixedRate(() -> {
-			long counter = slowTimers.stream().filter(s -> s.getOnScreen()).count();
-
-			if (counter == 0 && generate) {
-				int randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-
-				while ((randomXInitialPos >= FRAME_WIDTH / 2 - 50 && randomXInitialPos <= FRAME_WIDTH / 2 + 50)) {
-					randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-				}
-
-				SlowTimer st = new SlowTimer(SlowTimer.getInitialXPosition(randomXInitialPos));
-				slowTimers.add(st);
-			}
-			counter = 0;
-		}, 3, 10, TimeUnit.SECONDS);
-	}
-
-	// Generates a freezer power up every 10 seconds
-	public static void generateFreezers() {
-		executorPU.scheduleAtFixedRate(() -> {
-			long counter = freezers.stream().filter(f -> f.getOnScreen()).count();
-			if (counter == 0 && generate) {
-				int randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-
-				while ((randomXInitialPos >= FRAME_WIDTH / 2 - 50 && randomXInitialPos <= FRAME_WIDTH / 2 + 50)) {
-					randomXInitialPos = (int) (Math.random() * (FRAME_WIDTH - 50)) + 21;
-				}
-				Freezer fr = new Freezer(Freezer.getInitialXPosition(randomXInitialPos));
-				freezers.add(fr);
-			}
-			counter = 0;
-		}, 7, 14, TimeUnit.SECONDS);
-	}// END of generateFreezers method
-
-	/*
-	 * Adds gravity force to a ship
-	 * 
-	 * @param theShip the ship we add a gravity force to
-	 * 
-	 * @param thePlanet the planet around which theShip flies
-	 */
-	public static void gravityForce(SpaceShip theShip, Planet thePlanet) {
-		double dx = theShip.getXCenter() - thePlanet.getxCenter();
-		double dy = theShip.getYCenter() - thePlanet.getyCenter();
-
-		double distance = Math.sqrt(dx * dx + dy * dy);
-		double force = 0.1;
-
-		if (distance <= 50) {
-			force = thePlanet.getGravityForce() * 2;
-		} else if (distance <= 100) {
-			force = thePlanet.getGravityForce() * 2;
-		} else if (distance <= 150) {
-			force = thePlanet.getGravityForce() * 1;
-		} else if (distance <= 200) {
-			force = thePlanet.getGravityForce() * 1;
-		} else if (distance <= 250) {
-			force = thePlanet.getGravityForce() * 1;
-		} else if (distance <= 300) {
-			force = thePlanet.getGravityForce() * 1;
-		} else {
-			force = thePlanet.getGravityForce() * 1;
-		}
-
-		double angleRadians = Math.atan2(theShip.getYCenter() - thePlanet.getyCenter(),
-				theShip.getXCenter() - thePlanet.getxCenter());
-		double angleDegrees = Math.toDegrees(angleRadians);
-		if (angleDegrees < 0) {
-			angleDegrees = angleDegrees + 360;
-		}
-		theShip.setMovingAngle(angleDegrees);
-
-		if (angleDegrees <= 180) {
-			if (angleDegrees <= 90) {
-				if (theShip.getXVelocity() >= (-1) * SpaceShip.MAX_VELOCITY
-						&& theShip.getYVelocity() >= (-1) * SpaceShip.MAX_VELOCITY) {
-					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
-					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * force);
-				}
-			} else {
-				if (theShip.getXVelocity() <= SpaceShip.MAX_VELOCITY
-						&& theShip.getYVelocity() >= (-1) * SpaceShip.MAX_VELOCITY) {
-					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
-					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * force);
-				}
-			}
-		} else {
-			if (angleDegrees <= 270) {
-				if (theShip.getXVelocity() <= SpaceShip.MAX_VELOCITY
-						&& theShip.getYVelocity() <= SpaceShip.MAX_VELOCITY) {
-					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
-					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * force);
-				}
-			} else {
-				if (theShip.getXVelocity() >= (-1) * SpaceShip.MAX_VELOCITY
-						&& theShip.getYVelocity() <= SpaceShip.MAX_VELOCITY) {
-					theShip.decreaseXVelocity(theShip.shipXMoveAngle(theShip.getMovingAngle()) * 0.1);
-					theShip.decreaseYVelocity(theShip.shipYMoveAngle(theShip.getMovingAngle()) * force);
-				}
-			}
-		}
-
-		if (thePlanet.contains(theShip.getBounds2D())) {
-			theShip.setXVelocity(0);
-			theShip.setYVelocity(0);
-		}
-
-	}// END of gravityForce method
-
-	public static void getHighScores() throws NumberFormatException, IOException {
-		fr = new FileReader(highScores);
-		br = new BufferedReader(fr);
-		scoreTimes = new ArrayList<Double>();
-		scoresTotal = new ArrayList<String>();
-		HashMap<Double, String> map = new HashMap<Double, String>();
-		String line = null;
-		String[] playerScore = new String[2]; // 0 for name, 1 for score
-
-		while ((line = br.readLine()) != null) {
-			playerScore = line.split("Time:");
-			String pName = playerScore[0];
-			double pScore = Double.parseDouble(playerScore[1]);
-			scoreTimes.add(pScore);
-			map.put(pScore, pName);
-		}
-
-		Collections.sort(scoreTimes);
-		for (double score : scoreTimes) {
-			int index = scoreTimes.indexOf(score);
-			scoresTotal.add(index + 1 + ". " + map.get(score) + " " + String.format("%.2fs", score / 1000));
-		}
-	}// END of getHighScores method
-
-	// MAIN CODE FOR MAKING A SHIP FLOAT
-	public void shipFly() {
-		if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 'd') {
-			ship.increaseRotationAngle();
-			gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
-		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 'a') {
-			ship.decreaseRotationAngle();
-			gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
-		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 'w') {
-			ship.setMovingAngle(ship.getRotationAngle());
-			if (((ship.getRotationAngle() < 90 || ship.getRotationAngle() > 270)
-					&& ship.getXVelocity() <= SpaceShip.MAX_VELOCITY)
-					|| ((ship.getRotationAngle() >= 90 && ship.getRotationAngle() <= 270)
-							&& ship.getXVelocity() >= (-1) * SpaceShip.MAX_VELOCITY)) {
-				ship.increaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
-
-			}
-
-			if (((ship.getRotationAngle() >= 0 && ship.getRotationAngle() <= 180)
-					&& ship.getYVelocity() <= SpaceShip.MAX_VELOCITY)
-					|| ((ship.getRotationAngle() > 180 && ship.getRotationAngle() <= 359)
-							&& ship.getYVelocity() >= (-1) * SpaceShip.MAX_VELOCITY)) {
-				ship.increaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
-			}
-		} else if (AsteroidGameBoard.keyHeld == true && AsteroidGameBoard.keyChar == 's') {
-			ship.setMovingAngle(ship.getRotationAngle());
-			if (((ship.getRotationAngle() < 90 || ship.getRotationAngle() > 270)
-					&& ship.getXVelocity() > (-1) * SpaceShip.MAX_VELOCITY)
-					|| ((ship.getRotationAngle() >= 90 && ship.getRotationAngle() <= 270)
-							&& ship.getXVelocity() <= SpaceShip.MAX_VELOCITY)) {
-				ship.decreaseXVelocity(ship.shipXMoveAngle(ship.getMovingAngle()) * 0.1);
-			}
-			if (((ship.getRotationAngle() >= 0 && ship.getRotationAngle() <= 180)
-					&& ship.getYVelocity() > (-1) * SpaceShip.MAX_VELOCITY)
-					|| ((ship.getRotationAngle() > 180 && ship.getRotationAngle() <= 359)
-							&& ship.getYVelocity() <= SpaceShip.MAX_VELOCITY)) {
-				ship.decreaseYVelocity(ship.shipYMoveAngle(ship.getMovingAngle()) * 0.1);
-			}
-		} else {
-			gravityForce(AsteroidGameBoard.ship, AsteroidGameBoard.thePlanet);
-		}
-		ship.move();
-	}// END OF THE shipFly method
+	
 
 	class ComponentCreator extends JComponent {
 
@@ -465,13 +224,12 @@ public class AsteroidGameBoard extends JFrame {
 		public ComponentCreator() {
 			gameOverLabel = new JLabel("GAME OVER");
 			identity = new AffineTransform();
-
 			ship = new SpaceShip();
 			ship.setYCenter(ship.getYCenter() - 70);
 			thePlanet = new Planet("Venus", 60, Color.BLUE, 0.1);
-			generateAsteroids();
-			generateFreezers();
-			generateSlowTimers();
+			SpaceObjectsGenerator.generateAsteroids(asteroids);
+			SpaceObjectsGenerator.generateFreezers(executorPU, freezers);
+			SpaceObjectsGenerator.generateSlowTimers(executorPU, slowTimers);
 
 			try {
 				spaceImage = ImageIO.read(new File("./images/space.jpeg"));
@@ -518,7 +276,7 @@ public class AsteroidGameBoard extends JFrame {
 					drawSlowTimers();
 					drawTimePassed();
 
-					shipFly();
+					Gravity.controlShip(ship);
 					drawSpeedOfShip();
 
 					// making movement smooth
@@ -554,17 +312,11 @@ public class AsteroidGameBoard extends JFrame {
 					th.start();
 
 					if (!closed) {
-						try {
-							bw.write(playerName + "Time:" + timePassed);
-							bw.newLine();
-							bw.flush();
+							HighScoreUtil.appendScore(playerName, timePassed);
+							HighScoreUtil.getHighScores();
 							closed = true;
-
-							getHighScores();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
 					}
+					
 					g2.setColor(new Color(103, 255, 103));
 					g2.setFont(new Font("Aharoni", Font.BOLD, 30));
 					g2.drawString("HIGH SCORES", FRAME_WIDTH / 2 - 80, FRAME_HEIGHT / 4);
@@ -575,8 +327,8 @@ public class AsteroidGameBoard extends JFrame {
 
 					g2.setColor(new Color(50, 200, 50));
 					g2.setFont(new Font(Font.MONOSPACED, Font.BOLD, 17));
-					for (int i = 0; i < scoresTotal.size(); i++) {
-						g2.drawString(scoresTotal.get(i), (int) (FRAME_WIDTH / 2 - 75),
+					for (int i = 0; i < HighScoreUtil.getScoresTotal().size(); i++) {
+						g2.drawString(HighScoreUtil.getScoresTotal().get(i), (int) (FRAME_WIDTH / 2 - 75),
 								(int) (FRAME_HEIGHT / 3 + i * 30));
 					}
 					gameOver = true;
