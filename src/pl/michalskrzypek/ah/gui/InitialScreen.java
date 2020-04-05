@@ -27,7 +27,7 @@ public class InitialScreen extends JFrame {
 			+ "p - pause the game\n\nINSTRUCTION:\nTry to destroy every asteroid!\n"
 			+ "Press ENTER to strike an asteroid.\nCollect green power-ups to freeze asteroids for 5 seconds!\n"
 			+ "You can collide with an asteroid up to 5 times, \nso be careful!\n\n"
-			+ "Asteroid Hunter® by Michal Skrzypek\nmskrzypek97@gmail.com";
+			+ "Asteroid HunterÂ®;
 	public static final String[] GAME_LEVELS = { "Easy", "Medium", "Hard" };
 	private static Clip clip;
 	private static String level = "Easy";
