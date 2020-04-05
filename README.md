@@ -14,7 +14,7 @@ The aim is to shoot all the asteroids from the board. You control the ship while
 ![GameScreen.png](https://i.imgur.com/GbxVWkU.png)
 ![GameScreen2.png](https://i.imgur.com/XcZDoto.png)
 
-#### Your score matters!  
+#### Your score matters!not  
 ![HighScores.png](https://i.imgur.com/weBIr8O.png)
 
 ## How can I run it?
